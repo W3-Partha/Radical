@@ -30,7 +30,7 @@ var DefaultRadiantPro = &Container{
 		ApiPrefix:     "/api",
 		EnableModule:  nil,
 		Models:        make(map[string]TextModel),
-		GitRemotePath: "https://github.com/radiant/radiant-pro.git",
+		GitRemotePath: "https://github.com/W3-Engineers-Ltd/radiant-pro.git",
 		Branch:        "master",
 		GitLocalPath:  system.RadiantHome + "/radiant-pro",
 		EnableFormat:  true,
