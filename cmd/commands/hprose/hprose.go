@@ -93,7 +93,7 @@ func createhprose(cmd *commands.Command, args []string) int {
 		apppath = path.Join(utils.GetRadicalWorkPath(), args[0])
 		packpath = args[0]
 		if radiantVersion.String() == `` {
-			radiantVersion.Set(utils.BEEGO_VERSION)
+			radiantVersion.Set(utils.RADIANT_VERSION)
 		}
 	}
 

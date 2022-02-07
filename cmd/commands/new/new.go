@@ -287,7 +287,7 @@ func CreateApp(cmd *commands.Command, args []string) int {
 		appPath = path.Join(utils.GetRadicalWorkPath(), args[0])
 		packPath = args[0]
 		if radiantVersion.String() == `` {
-			radiantVersion.Set(utils.BEEGO_VERSION)
+			radiantVersion.Set(utils.RADIANT_VERSION)
 		}
 	}
 

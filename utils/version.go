@@ -14,4 +14,4 @@
 
 package utils
 
-const BEEGO_VERSION = "v2.0.1"
+const RADIANT_VERSION = "v1.0.2"
