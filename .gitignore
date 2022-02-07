@@ -27,7 +27,7 @@ _testmain.go
 
 #Custom
 .DS_Store
-bee
+radical
 *.exe~
 .goxc.local.json
 vendor

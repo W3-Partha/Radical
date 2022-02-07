@@ -1,4 +1,4 @@
-package beegopro
+package radiantpro
 
 type Parser interface {
 	RegisterOption(userOption UserOption, tmplOption TmplOption)

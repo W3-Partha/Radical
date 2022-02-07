@@ -1,4 +1,4 @@
-// Copyright 2017 bee authors
+// Copyright 2017 radical authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License"): you may
 // not use this file except in compliance with the License. You may obtain
@@ -24,10 +24,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/beego/bee/v2/cmd/commands"
-	"github.com/beego/bee/v2/cmd/commands/version"
-	beeLogger "github.com/beego/bee/v2/logger"
-	"github.com/beego/bee/v2/utils"
+	"github.com/W3-Partha/Radical/cmd/commands"
+	"github.com/W3-Partha/Radical/cmd/commands/version"
+	radicalLogger "github.com/W3-Partha/Radical/logger"
+	"github.com/W3-Partha/Radical/utils"
 	"github.com/fsnotify/fsnotify"
 	"github.com/go-delve/delve/pkg/terminal"
 	"github.com/go-delve/delve/service"
@@ -42,7 +42,7 @@ var cmdDlv = &commands.Command{
 	Short:       "Start a debugging session using Delve",
 	Long: `dlv command start a debugging session using debugging tool Delve.
 
-  To debug your application using Delve, use: {{"$ bee dlv" | bold}}
+  To debug your application using Delve, use: {{"$ radical dlv" | bold}}
 
   For more information on Delve: https://github.com/go-delve/delve
 `,
@@ -67,7 +67,7 @@ func init() {
 
 func runDlv(cmd *commands.Command, args []string) int {
 	if err := cmd.Flag.Parse(args); err != nil {
-		beeLogger.Log.Fatalf("Error while parsing flags: %v", err.Error())
+		radicalLogger.Log.Fatalf("Error while parsing flags: %v", err.Error())
 	}
 
 	var (
@@ -77,7 +77,7 @@ func runDlv(cmd *commands.Command, args []string) int {
 	)
 
 	if err := loadPathsToWatch(&paths); err != nil {
-		beeLogger.Log.Fatalf("Error while loading paths to watch: %v", err.Error())
+		radicalLogger.Log.Fatalf("Error while loading paths to watch: %v", err.Error())
 	}
 	go startWatcher(paths, notifyChan)
 	return startDelveDebugger(addr, notifyChan)
@@ -126,23 +126,23 @@ func loadPathsToWatch(paths *[]string) error {
 
 // startDelveDebugger starts the Delve debugger server
 func startDelveDebugger(addr string, ch chan int) int {
-	beeLogger.Log.Info("Starting Delve Debugger...")
+	radicalLogger.Log.Info("Starting Delve Debugger...")
 
 	fp, err := buildDebug()
 	if err != nil {
-		beeLogger.Log.Fatalf("Error while building debug binary: %v", err)
+		radicalLogger.Log.Fatalf("Error while building debug binary: %v", err)
 	}
 	defer os.Remove(fp)
 
 	abs, err := filepath.Abs("./debug")
 	if err != nil {
-		beeLogger.Log.Fatalf("%v", err)
+		radicalLogger.Log.Fatalf("%v", err)
 	}
 
 	// Create and start the debugger server
 	listener, err := net.Listen("tcp", addr)
 	if err != nil {
-		beeLogger.Log.Fatalf("Could not start listener: %s", err)
+		radicalLogger.Log.Fatalf("Could not start listener: %s", err)
 	}
 	defer listener.Close()
 
@@ -158,7 +158,7 @@ func startDelveDebugger(addr string, ch chan int) int {
 		},
 	})
 	if err := server.Run(); err != nil {
-		beeLogger.Log.Fatalf("Could not start debugger server: %v", err)
+		radicalLogger.Log.Fatalf("Could not start debugger server: %v", err)
 	}
 
 	// Start the Delve client REPL
@@ -168,10 +168,10 @@ func startDelveDebugger(addr string, ch chan int) int {
 		for {
 			if val := <-ch; val == 0 {
 				if _, err := client.Restart(true); err != nil {
-					utils.Notify("Error while restarting the client: "+err.Error(), "bee")
+					utils.Notify("Error while restarting the client: "+err.Error(), "radical")
 				} else {
 					if verbose {
-						utils.Notify("Delve Debugger Restarted", "bee")
+						utils.Notify("Delve Debugger Restarted", "radical")
 					}
 				}
 			}
@@ -182,12 +182,12 @@ func startDelveDebugger(addr string, ch chan int) int {
 	term := terminal.New(client, nil)
 	status, err := term.Run()
 	if err != nil {
-		beeLogger.Log.Fatalf("Could not start Delve REPL: %v", err)
+		radicalLogger.Log.Fatalf("Could not start Delve REPL: %v", err)
 	}
 
 	// Stop and kill the debugger server once user quits the REPL
 	if err := server.Stop(); err != nil {
-		beeLogger.Log.Fatalf("Could not stop Delve server: %v", err)
+		radicalLogger.Log.Fatalf("Could not stop Delve server: %v", err)
 	}
 	return status
 }
@@ -198,14 +198,14 @@ var eventsModTime = make(map[string]int64)
 func startWatcher(paths []string, ch chan int) {
 	watcher, err := fsnotify.NewWatcher()
 	if err != nil {
-		beeLogger.Log.Fatalf("Could not start the watcher: %v", err)
+		radicalLogger.Log.Fatalf("Could not start the watcher: %v", err)
 	}
 	defer watcher.Close()
 
 	// Feed the paths to the watcher
 	for _, path := range paths {
 		if err := watcher.Add(path); err != nil {
-			beeLogger.Log.Fatalf("Could not set a watch on path: %v", err)
+			radicalLogger.Log.Fatalf("Could not set a watch on path: %v", err)
 		}
 	}
 
@@ -226,7 +226,7 @@ func startWatcher(paths []string, ch chan int) {
 			if build {
 				go func() {
 					if verbose {
-						utils.Notify("Rebuilding application with the new changes", "bee")
+						utils.Notify("Rebuilding application with the new changes", "radical")
 					}
 
 					// Wait 1s before re-build until there is no file change
@@ -234,7 +234,7 @@ func startWatcher(paths []string, ch chan int) {
 					time.Sleep(time.Until(scheduleTime))
 					_, err := buildDebug()
 					if err != nil {
-						utils.Notify("Build Failed: "+err.Error(), "bee")
+						utils.Notify("Build Failed: "+err.Error(), "radical")
 					} else {
 						ch <- 0 // Notify listeners
 					}

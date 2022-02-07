@@ -1,4 +1,4 @@
-package beegopro
+package radiantpro
 
 import (
 	"fmt"
@@ -6,10 +6,10 @@ import (
 	"sync"
 	"time"
 
-	"github.com/beego/bee/v2/internal/pkg/git"
-	"github.com/beego/bee/v2/internal/pkg/system"
-	beeLogger "github.com/beego/bee/v2/logger"
-	"github.com/beego/bee/v2/utils"
+	"github.com/W3-Partha/Radical/internal/pkg/git"
+	"github.com/W3-Partha/Radical/internal/pkg/system"
+	radicalLogger "github.com/W3-Partha/Radical/logger"
+	"github.com/W3-Partha/Radical/utils"
 	"github.com/davecgh/go-spew/spew"
 	"github.com/pelletier/go-toml"
 	"github.com/spf13/viper"
@@ -17,10 +17,10 @@ import (
 
 const MDateFormat = "20060102_150405"
 
-var DefaultBeegoPro = &Container{
-	BeegoProFile:  system.CurrentDir + "/beegopro.toml",
-	TimestampFile: system.CurrentDir + "/.beegopro.timestamp",
-	GoModFile:     system.CurrentDir + "/go.mod",
+var DefaultRadiantPro = &Container{
+	RadiantProFile: system.CurrentDir + "/radiantpro.toml",
+	TimestampFile:  system.CurrentDir + "/.radiantpro.timestamp",
+	GoModFile:      system.CurrentDir + "/go.mod",
 	UserOption: UserOption{
 		Debug:         false,
 		ContextDebug:  false,
@@ -30,14 +30,14 @@ var DefaultBeegoPro = &Container{
 		ApiPrefix:     "/api",
 		EnableModule:  nil,
 		Models:        make(map[string]TextModel),
-		GitRemotePath: "https://github.com/beego/beego-pro.git",
+		GitRemotePath: "https://github.com/radiant/radiant-pro.git",
 		Branch:        "master",
-		GitLocalPath:  system.BeegoHome + "/beego-pro",
+		GitLocalPath:  system.RadiantHome + "/radiant-pro",
 		EnableFormat:  true,
 		SourceGen:     "text",
 		EnableGitPull: true,
 		Path: map[string]string{
-			"beego": ".",
+			"radiant": ".",
 		},
 		EnableGomod:    true,
 		RefreshGitTime: 24 * 3600,
@@ -62,20 +62,20 @@ func (c *Container) Run() {
 }
 
 func (c *Container) initUserOption() {
-	if !utils.IsExist(c.BeegoProFile) {
-		beeLogger.Log.Fatalf("beego pro config is not exist, beego json path: %s", c.BeegoProFile)
+	if !utils.IsExist(c.RadiantProFile) {
+		radicalLogger.Log.Fatalf("radiant pro config is not exist, radiant json path: %s", c.RadiantProFile)
 		return
 	}
-	viper.SetConfigFile(c.BeegoProFile)
+	viper.SetConfigFile(c.RadiantProFile)
 	err := viper.ReadInConfig()
 	if err != nil {
-		beeLogger.Log.Fatalf("read beego pro config content, err: %s", err.Error())
+		radicalLogger.Log.Fatalf("read radiant pro config content, err: %s", err.Error())
 		return
 	}
 
 	err = viper.Unmarshal(&c.UserOption)
 	if err != nil {
-		beeLogger.Log.Fatalf("beego pro config unmarshal error, err: %s", err.Error())
+		radicalLogger.Log.Fatalf("radiant pro config unmarshal error, err: %s", err.Error())
 		return
 	}
 	if c.UserOption.Debug {
@@ -84,7 +84,7 @@ func (c *Container) initUserOption() {
 
 	if c.UserOption.EnableGomod {
 		if !utils.IsExist(c.GoModFile) {
-			beeLogger.Log.Fatalf("go mod not exist, please create go mod file")
+			radicalLogger.Log.Fatalf("go mod not exist, please create go mod file")
 			return
 		}
 	}
@@ -107,21 +107,21 @@ func (c *Container) initTemplateOption() {
 	if c.UserOption.EnableGitPull && (c.GenerateTimeUnix-c.Timestamp.GitCacheLastRefresh > c.UserOption.RefreshGitTime) {
 		err := git.CloneORPullRepo(c.UserOption.GitRemotePath, c.UserOption.GitLocalPath)
 		if err != nil {
-			beeLogger.Log.Fatalf("beego pro git clone or pull repo error, err: %s", err)
+			radicalLogger.Log.Fatalf("radiant pro git clone or pull repo error, err: %s", err)
 			return
 		}
 		c.Timestamp.GitCacheLastRefresh = c.GenerateTimeUnix
 	}
 
-	tree, err := toml.LoadFile(c.UserOption.GitLocalPath + "/" + c.UserOption.ProType + "/bee.toml")
+	tree, err := toml.LoadFile(c.UserOption.GitLocalPath + "/" + c.UserOption.ProType + "/radical.toml")
 
 	if err != nil {
-		beeLogger.Log.Fatalf("beego tmpl exec error, err: %s", err)
+		radicalLogger.Log.Fatalf("radiant tmpl exec error, err: %s", err)
 		return
 	}
 	err = tree.Unmarshal(&c.TmplOption)
 	if err != nil {
-		beeLogger.Log.Fatalf("beego tmpl parse error, err: %s", err)
+		radicalLogger.Log.Fatalf("radiant tmpl parse error, err: %s", err)
 		return
 	}
 
@@ -139,7 +139,7 @@ func (c *Container) initTemplateOption() {
 func (c *Container) initParser() {
 	driver, flag := ParserDriver[c.UserOption.SourceGen]
 	if !flag {
-		beeLogger.Log.Fatalf("parse driver not exit, source gen %s", c.UserOption.SourceGen)
+		radicalLogger.Log.Fatalf("parse driver not exit, source gen %s", c.UserOption.SourceGen)
 	}
 	driver.RegisterOption(c.UserOption, c.TmplOption)
 	c.Parser = driver
@@ -177,7 +177,7 @@ func (c *Container) renderModel(m RenderInfo) {
 	if render.Descriptor.IsExistScript() {
 		err := render.Descriptor.ExecScript(c.CurPath)
 		if err != nil {
-			beeLogger.Log.Fatalf("beego exec shell error, err: %s", err)
+			radicalLogger.Log.Fatalf("radiant exec shell error, err: %s", err)
 		}
 	}
 }
@@ -186,12 +186,12 @@ func (c *Container) initTimestamp() {
 	if utils.IsExist(c.TimestampFile) {
 		tree, err := toml.LoadFile(c.TimestampFile)
 		if err != nil {
-			beeLogger.Log.Fatalf("beego timestamp tmpl exec error, err: %s", err)
+			radicalLogger.Log.Fatalf("radiant timestamp tmpl exec error, err: %s", err)
 			return
 		}
 		err = tree.Unmarshal(&c.Timestamp)
 		if err != nil {
-			beeLogger.Log.Fatalf("beego timestamp tmpl parse error, err: %s", err)
+			radicalLogger.Log.Fatalf("radiant timestamp tmpl parse error, err: %s", err)
 			return
 		}
 	}
@@ -201,10 +201,10 @@ func (c *Container) initTimestamp() {
 func (c *Container) flushTimestamp() {
 	tomlByte, err := toml.Marshal(c.Timestamp)
 	if err != nil {
-		beeLogger.Log.Fatalf("marshal timestamp tmpl parse error, err: %s", err)
+		radicalLogger.Log.Fatalf("marshal timestamp tmpl parse error, err: %s", err)
 	}
 	err = ioutil.WriteFile(c.TimestampFile, tomlByte, 0644)
 	if err != nil {
-		beeLogger.Log.Fatalf("flush timestamp tmpl parse error, err: %s", err)
+		radicalLogger.Log.Fatalf("flush timestamp tmpl parse error, err: %s", err)
 	}
 }

@@ -1,4 +1,4 @@
-// Copyright 2017 bee authors
+// Copyright 2017 radical authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License"): you may
 // not use this file except in compliance with the License. You may obtain
@@ -24,21 +24,21 @@ import (
 
 	"strings"
 
-	"github.com/beego/bee/v2/cmd/commands"
-	"github.com/beego/bee/v2/cmd/commands/version"
-	"github.com/beego/bee/v2/config"
-	"github.com/beego/bee/v2/logger"
-	"github.com/beego/bee/v2/logger/colors"
-	"github.com/beego/bee/v2/utils"
+	"github.com/W3-Partha/Radical/cmd/commands"
+	"github.com/W3-Partha/Radical/cmd/commands/version"
+	"github.com/W3-Partha/Radical/config"
+	"github.com/W3-Partha/Radical/logger"
+	"github.com/W3-Partha/Radical/logger/colors"
+	"github.com/W3-Partha/Radical/utils"
 )
 
 var cmdRs = &commands.Command{
 	UsageLine: "rs",
 	Short:     "Run customized scripts",
-	Long: `Run script allows you to run arbitrary commands using Bee.
-  Custom commands are provided from the "scripts" object inside bee.json or Beefile.
+	Long: `Run script allows you to run arbitrary commands using Radical.
+  Custom commands are provided from the "scripts" object inside radical.json or Radicalfile.
 
-  To run a custom command, use: {{"$ bee rs mycmd ARGS" | bold}}
+  To run a custom command, use: {{"$ radical rs mycmd ARGS" | bold}}
   {{if len .}}
 {{"AVAILABLE SCRIPTS"|headline}}{{range $cmdName, $cmd := .}}
   {{$cmdName | bold}}
@@ -69,10 +69,10 @@ func runScript(cmd *commands.Command, args []string) int {
 			Args:    args,
 		}
 		if err := command.run(); err != nil {
-			beeLogger.Log.Error(err.Error())
+			radicalLogger.Log.Error(err.Error())
 		}
 	} else {
-		beeLogger.Log.Errorf("Command '%s' not found in Beefile/bee.json", script)
+		radicalLogger.Log.Errorf("Command '%s' not found in Radicalfile/radical.json", script)
 	}
 	elapsed := time.Since(start)
 	fmt.Println(colors.GreenBold(fmt.Sprintf("Finished in %s.", elapsed)))
@@ -86,7 +86,7 @@ type customCommand struct {
 }
 
 func (c *customCommand) run() error {
-	beeLogger.Log.Info(colors.GreenBold(fmt.Sprintf("Running '%s'...", c.Name)))
+	radicalLogger.Log.Info(colors.GreenBold(fmt.Sprintf("Running '%s'...", c.Name)))
 	var cmd *exec.Cmd
 	switch runtime.GOOS {
 	case "darwin", "linux":

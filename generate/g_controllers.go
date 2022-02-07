@@ -1,4 +1,4 @@
-// Copyright 2013 bee authors
+// Copyright 2013 radical authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License"): you may
 // not use this file except in compliance with the License. You may obtain
@@ -20,9 +20,9 @@ import (
 	"path"
 	"strings"
 
-	beeLogger "github.com/beego/bee/v2/logger"
-	"github.com/beego/bee/v2/logger/colors"
-	"github.com/beego/bee/v2/utils"
+	radicalLogger "github.com/W3-Partha/Radical/logger"
+	"github.com/W3-Partha/Radical/logger/colors"
+	"github.com/W3-Partha/Radical/utils"
 )
 
 func GenerateController(cname, currpath string) {
@@ -37,14 +37,14 @@ func GenerateController(cname, currpath string) {
 		packageName = p[i+1 : len(p)-1]
 	}
 
-	beeLogger.Log.Infof("Using '%s' as controller name", controllerName)
-	beeLogger.Log.Infof("Using '%s' as package name", packageName)
+	radicalLogger.Log.Infof("Using '%s' as controller name", controllerName)
+	radicalLogger.Log.Infof("Using '%s' as package name", packageName)
 
 	fp := path.Join(currpath, "controllers", p)
 	if _, err := os.Stat(fp); os.IsNotExist(err) {
 		// Create the controller's directory
 		if err := os.MkdirAll(fp, 0777); err != nil {
-			beeLogger.Log.Fatalf("Could not create controllers directory: %s", err)
+			radicalLogger.Log.Fatalf("Could not create controllers directory: %s", err)
 		}
 	}
 
@@ -56,7 +56,7 @@ func GenerateController(cname, currpath string) {
 
 		var content string
 		if _, err := os.Stat(modelPath); err == nil {
-			beeLogger.Log.Infof("Using matching model '%s'", controllerName)
+			radicalLogger.Log.Infof("Using matching model '%s'", controllerName)
 			content = strings.Replace(controllerModelTpl, "{{packageName}}", packageName, -1)
 			pkgPath := getPackagePath(currpath)
 			content = strings.Replace(content, "{{pkgPath}}", pkgPath, -1)
@@ -71,19 +71,19 @@ func GenerateController(cname, currpath string) {
 		utils.FormatSourceCode(fpath)
 		fmt.Fprintf(w, "\t%s%screate%s\t %s%s\n", "\x1b[32m", "\x1b[1m", "\x1b[21m", fpath, "\x1b[0m")
 	} else {
-		beeLogger.Log.Fatalf("Could not create controller file: %s", err)
+		radicalLogger.Log.Fatalf("Could not create controller file: %s", err)
 	}
 }
 
 var controllerTpl = `package {{packageName}}
 
 import (
-	beego "github.com/beego/beego/v2/server/web"
+	radiant "github.com/W3-Engineers-Ltd/Radiant/server/web"
 )
 
 // {{controllerName}}Controller operations for {{controllerName}}
 type {{controllerName}}Controller struct {
-	beego.Controller
+	radiant.Controller
 }
 
 // URLMapping ...
@@ -166,12 +166,12 @@ import (
 	"strconv"
 	"strings"
 
-	beego "github.com/beego/beego/v2/server/web"
+	radiant "github.com/W3-Engineers-Ltd/Radiant/server/web"
 )
 
 //  {{controllerName}}Controller operations for {{controllerName}}
 type {{controllerName}}Controller struct {
-	beego.Controller
+	radiant.Controller
 }
 
 // URLMapping ...

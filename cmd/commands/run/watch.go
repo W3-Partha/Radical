@@ -1,4 +1,4 @@
-// Copyright 2013 bee authors
+// Copyright 2013 radical authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License"): you may
 // not use this file except in compliance with the License. You may obtain
@@ -24,10 +24,10 @@ import (
 	"sync"
 	"time"
 
-	"github.com/beego/bee/v2/config"
-	beeLogger "github.com/beego/bee/v2/logger"
-	"github.com/beego/bee/v2/logger/colors"
-	"github.com/beego/bee/v2/utils"
+	"github.com/W3-Partha/Radical/config"
+	radicalLogger "github.com/W3-Partha/Radical/logger"
+	"github.com/W3-Partha/Radical/logger/colors"
+	"github.com/W3-Partha/Radical/utils"
 	"github.com/fsnotify/fsnotify"
 )
 
@@ -51,7 +51,7 @@ var (
 func NewWatcher(paths []string, files []string, isgenerate bool) {
 	watcher, err := fsnotify.NewWatcher()
 	if err != nil {
-		beeLogger.Log.Fatalf("Failed to create watcher: %s", err)
+		radicalLogger.Log.Fatalf("Failed to create watcher: %s", err)
 	}
 
 	go func() {
@@ -74,14 +74,14 @@ func NewWatcher(paths []string, files []string, isgenerate bool) {
 
 				mt := utils.GetFileModTime(e.Name)
 				if t := eventTime[e.Name]; mt == t {
-					beeLogger.Log.Hintf(colors.Bold("Skipping: ")+"%s", e.String())
+					radicalLogger.Log.Hintf(colors.Bold("Skipping: ")+"%s", e.String())
 					isBuild = false
 				}
 
 				eventTime[e.Name] = mt
 
 				if isBuild {
-					beeLogger.Log.Hintf("Event fired: %s", e)
+					radicalLogger.Log.Hintf("Event fired: %s", e)
 					go func() {
 						// Wait 1s before autobuild until there is no file change.
 						scheduleTime = time.Now().Add(1 * time.Second)
@@ -96,17 +96,17 @@ func NewWatcher(paths []string, files []string, isgenerate bool) {
 					}()
 				}
 			case err := <-watcher.Errors:
-				beeLogger.Log.Warnf("Watcher error: %s", err.Error()) // No need to exit here
+				radicalLogger.Log.Warnf("Watcher error: %s", err.Error()) // No need to exit here
 			}
 		}
 	}()
 
-	beeLogger.Log.Info("Initializing watcher...")
+	radicalLogger.Log.Info("Initializing watcher...")
 	for _, path := range paths {
-		beeLogger.Log.Hintf(colors.Bold("Watching: ")+"%s", path)
+		radicalLogger.Log.Hintf(colors.Bold("Watching: ")+"%s", path)
 		err = watcher.Add(path)
 		if err != nil {
-			beeLogger.Log.Fatalf("Failed to watch directory: %s", err)
+			radicalLogger.Log.Fatalf("Failed to watch directory: %s", err)
 		}
 	}
 }
@@ -135,16 +135,16 @@ func AutoBuild(files []string, isgenerate bool) {
 	}
 
 	if isgenerate {
-		beeLogger.Log.Info("Generating the docs...")
-		icmd := exec.Command("bee", "generate", "docs")
+		radicalLogger.Log.Info("Generating the docs...")
+		icmd := exec.Command("radical", "generate", "docs")
 		icmd.Env = append(os.Environ(), "GOGC=off")
 		err = icmd.Run()
 		if err != nil {
 			utils.Notify("", "Failed to generate the docs.")
-			beeLogger.Log.Errorf("Failed to generate the docs.")
+			radicalLogger.Log.Errorf("Failed to generate the docs.")
 			return
 		}
-		beeLogger.Log.Success("Docs generated!")
+		radicalLogger.Log.Success("Docs generated!")
 	}
 	appName := appname
 	if err == nil {
@@ -169,12 +169,12 @@ func AutoBuild(files []string, isgenerate bool) {
 		err = bcmd.Run()
 		if err != nil {
 			utils.Notify(stderr.String(), "Build Failed")
-			beeLogger.Log.Errorf("Failed to build the application: %s", stderr.String())
+			radicalLogger.Log.Errorf("Failed to build the application: %s", stderr.String())
 			return
 		}
 	}
 
-	beeLogger.Log.Success("Built Successfully!")
+	radicalLogger.Log.Success("Built Successfully!")
 	Restart(appName)
 }
 
@@ -182,7 +182,7 @@ func AutoBuild(files []string, isgenerate bool) {
 func Kill() {
 	defer func() {
 		if e := recover(); e != nil {
-			beeLogger.Log.Infof("Kill recover: %s", e)
+			radicalLogger.Log.Infof("Kill recover: %s", e)
 		}
 	}()
 	if cmd != nil && cmd.Process != nil {
@@ -203,10 +203,10 @@ func Kill() {
 		case <-ch:
 			return
 		case <-time.After(10 * time.Second):
-			beeLogger.Log.Info("Timeout. Force kill cmd process")
+			radicalLogger.Log.Info("Timeout. Force kill cmd process")
 			err := cmd.Process.Kill()
 			if err != nil {
-				beeLogger.Log.Errorf("Error while killing cmd process: %s", err)
+				radicalLogger.Log.Errorf("Error while killing cmd process: %s", err)
 			}
 			return
 		}
@@ -215,14 +215,14 @@ func Kill() {
 
 // Restart kills the running command process and starts it again
 func Restart(appname string) {
-	beeLogger.Log.Debugf("Kill running process", utils.FILE(), utils.LINE())
+	radicalLogger.Log.Debugf("Kill running process", utils.FILE(), utils.LINE())
 	Kill()
 	go Start(appname)
 }
 
 // Start starts the command process
 func Start(appname string) {
-	beeLogger.Log.Infof("Restarting '%s'...", appname)
+	radicalLogger.Log.Infof("Restarting '%s'...", appname)
 	if !strings.Contains(appname, "./") {
 		appname = "./" + appname
 	}
@@ -240,7 +240,7 @@ func Start(appname string) {
 	cmd.Env = append(os.Environ(), config.Conf.Envs...)
 
 	go cmd.Run()
-	beeLogger.Log.Successf("'%s' is running...", appname)
+	radicalLogger.Log.Successf("'%s' is running...", appname)
 	started <- true
 }
 
@@ -259,7 +259,7 @@ func shouldIgnoreFile(filename string) bool {
 	for _, regex := range ignoredFilesRegExps {
 		r, err := regexp.Compile(regex)
 		if err != nil {
-			beeLogger.Log.Fatalf("Could not compile regular expression: %s", err)
+			radicalLogger.Log.Fatalf("Could not compile regular expression: %s", err)
 		}
 		if r.MatchString(filename) {
 			return true

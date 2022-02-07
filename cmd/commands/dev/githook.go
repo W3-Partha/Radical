@@ -17,7 +17,7 @@ package dev
 import (
 	"os"
 
-	beeLogger "github.com/beego/bee/v2/logger"
+	radicalLogger "github.com/W3-Partha/Radical/logger"
 )
 
 var preCommit = `
@@ -32,7 +32,7 @@ func initGitHook() {
 	pcfPath := "./.git/hooks/pre-commit"
 	pcf, err := os.OpenFile(pcfPath, os.O_RDWR|os.O_CREATE, 0777)
 	if err != nil {
-		beeLogger.Log.Errorf("try to create or open file failed: %s, cause: %s", pcfPath, err.Error())
+		radicalLogger.Log.Errorf("try to create or open file failed: %s, cause: %s", pcfPath, err.Error())
 		return
 	}
 
@@ -40,8 +40,8 @@ func initGitHook() {
 	_, err = pcf.Write(([]byte)(preCommit))
 
 	if err != nil {
-		beeLogger.Log.Errorf("could not init githooks: %s", err.Error())
+		radicalLogger.Log.Errorf("could not init githooks: %s", err.Error())
 	} else {
-		beeLogger.Log.Successf("The githooks has been added, the content is:\n %s ", preCommit)
+		radicalLogger.Log.Successf("The githooks has radicaln added, the content is:\n %s ", preCommit)
 	}
 }

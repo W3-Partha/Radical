@@ -1,23 +1,23 @@
-package beegopro
+package radiantpro
 
 import (
 	"io/ioutil"
 
-	"github.com/beego/bee/v2/internal/pkg/utils"
-	beeLogger "github.com/beego/bee/v2/logger"
+	"github.com/W3-Partha/Radical/internal/pkg/utils"
+	radicalLogger "github.com/W3-Partha/Radical/logger"
 )
 
-var CompareExcept = []string{"@BeeGenerateTime"}
+var CompareExcept = []string{"@RadicalGenerateTime"}
 
 func (c *Container) GenConfig() {
-	if utils.IsExist(c.BeegoProFile) {
-		beeLogger.Log.Fatalf("beego pro toml exist")
+	if utils.IsExist(c.RadiantProFile) {
+		radicalLogger.Log.Fatalf("radiant pro toml exist")
 		return
 	}
 
-	err := ioutil.WriteFile("beegopro.toml", []byte(BeegoToml), 0644)
+	err := ioutil.WriteFile("radiantpro.toml", []byte(RadiantToml), 0644)
 	if err != nil {
-		beeLogger.Log.Fatalf("write beego pro toml err: %s", err)
+		radicalLogger.Log.Fatalf("write radiant pro toml err: %s", err)
 		return
 	}
 }

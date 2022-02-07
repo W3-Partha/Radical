@@ -1,4 +1,4 @@
-package beegopro
+package radiantpro
 
 import (
 	"crypto/md5"
@@ -11,8 +11,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/beego/bee/v2/internal/pkg/utils"
-	beeLogger "github.com/beego/bee/v2/logger"
+	"github.com/W3-Partha/Radical/internal/pkg/utils"
+	radicalLogger "github.com/W3-Partha/Radical/logger"
 )
 
 // write to file
@@ -39,7 +39,7 @@ func (c *RenderFile) write(filename string, buf []byte) (err error) {
 
 	if utils.IsExist(filename) {
 		bakName := fmt.Sprintf("%s/%s.%s.bak", filePathBak, filepath.Base(name), time.Now().Format("2006.01.02.15.04.05"))
-		beeLogger.Log.Infof("bak file '%s'", bakName)
+		radicalLogger.Log.Infof("bak file '%s'", bakName)
 		if err := os.Rename(filename, bakName); err != nil {
 			err = errors.New("file is bak error, path is " + bakName)
 			return err
@@ -50,7 +50,7 @@ func (c *RenderFile) write(filename string, buf []byte) (err error) {
 	defer func() {
 		err = file.Close()
 		if err != nil {
-			beeLogger.Log.Fatalf("file close error, err %s", err)
+			radicalLogger.Log.Fatalf("file close error, err %s", err)
 		}
 	}()
 	if err != nil {
@@ -82,8 +82,8 @@ func isNeedOverwrite(fileName string) (flag bool) {
 	}
 	for _, s := range strings.Split(string(contentByte), "\n") {
 		s = strings.TrimSpace(strings.TrimPrefix(s, seg))
-		if strings.HasPrefix(s, "@BeeOverwrite") {
-			overwrite = strings.TrimSpace(s[len("@BeeOverwrite"):])
+		if strings.HasPrefix(s, "@RadicalOverwrite") {
+			overwrite = strings.TrimSpace(s[len("@RadicalOverwrite"):])
 		}
 	}
 	if strings.ToLower(overwrite) == "yes" {
@@ -164,7 +164,7 @@ func getModelType(orm string) (inputType, goType, mysqlType, tag string) {
 		tag = ""
 		mysqlType = "float NOT NULL"
 	default:
-		beeLogger.Log.Fatalf("not support type: %s", inputType)
+		radicalLogger.Log.Fatalf("not support type: %s", inputType)
 	}
 	// user set orm tag
 	if len(kv) == 2 {
@@ -184,7 +184,7 @@ func FileContentChange(org, new []byte, seg string) bool {
 	if orgMd5 != newMd5 {
 		return true
 	}
-	beeLogger.Log.Infof("File has no change in the content")
+	radicalLogger.Log.Infof("File has no change in the content")
 	return false
 }
 

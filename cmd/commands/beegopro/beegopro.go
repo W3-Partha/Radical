@@ -1,4 +1,4 @@
-// Copyright 2013 bee authors
+// Copyright 2013 radical authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License"): you may
 // not use this file except in compliance with the License. You may obtain
@@ -11,33 +11,33 @@
 // WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 // License for the specific language governing permissions and limitations
 // under the License.
-package beegopro
+package radiantpro
 
 import (
 	"strings"
 
-	"github.com/beego/bee/v2/cmd/commands"
-	"github.com/beego/bee/v2/internal/app/module/beegopro"
-	"github.com/beego/bee/v2/logger"
+	"github.com/W3-Partha/Radical/cmd/commands"
+	"github.com/W3-Partha/Radical/internal/app/module/radiantpro"
+	"github.com/W3-Partha/Radical/logger"
 )
 
-var CmdBeegoPro = &commands.Command{
+var CmdRadiantPro = &commands.Command{
 	UsageLine: "pro [command]",
 	Short:     "Source code generator",
 	Long:      ``,
-	Run:       BeegoPro,
+	Run:       RadiantPro,
 }
 
 func init() {
-	CmdBeegoPro.Flag.Var(&beegopro.SQL, "sql", "sql file path")
-	CmdBeegoPro.Flag.Var(&beegopro.SQLMode, "sqlmode", "sql mode")
-	CmdBeegoPro.Flag.Var(&beegopro.SQLModePath, "sqlpath", "sql mode path")
-	commands.AvailableCommands = append(commands.AvailableCommands, CmdBeegoPro)
+	CmdRadiantPro.Flag.Var(&radiantpro.SQL, "sql", "sql file path")
+	CmdRadiantPro.Flag.Var(&radiantpro.SQLMode, "sqlmode", "sql mode")
+	CmdRadiantPro.Flag.Var(&radiantpro.SQLModePath, "sqlpath", "sql mode path")
+	commands.AvailableCommands = append(commands.AvailableCommands, CmdRadiantPro)
 }
 
-func BeegoPro(cmd *commands.Command, args []string) int {
+func RadiantPro(cmd *commands.Command, args []string) int {
 	if len(args) < 1 {
-		beeLogger.Log.Fatal("Command is missing")
+		radicalLogger.Log.Fatal("Command is missing")
 	}
 
 	if len(args) >= 2 {
@@ -47,14 +47,14 @@ func BeegoPro(cmd *commands.Command, args []string) int {
 	gcmd := args[0]
 	switch gcmd {
 	case "gen":
-		beegopro.DefaultBeegoPro.Run()
+		radiantpro.DefaultRadiantPro.Run()
 	case "config":
-		beegopro.DefaultBeegoPro.GenConfig()
+		radiantpro.DefaultRadiantPro.GenConfig()
 	case "migration":
-		beegopro.DefaultBeegoPro.Migration(args)
+		radiantpro.DefaultRadiantPro.Migration(args)
 	default:
-		beeLogger.Log.Fatal("Command is missing")
+		radicalLogger.Log.Fatal("Command is missing")
 	}
-	beeLogger.Log.Successf("%s successfully generated!", strings.Title(gcmd))
+	radicalLogger.Log.Successf("%s successfully generated!", strings.Title(gcmd))
 	return 0
 }

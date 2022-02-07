@@ -1,4 +1,4 @@
-package beegopro
+package radiantpro
 
 type RenderInfo struct {
 	Module       string

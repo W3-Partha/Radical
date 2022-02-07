@@ -1,4 +1,4 @@
-// Copyright 2013 bee authors
+// Copyright 2013 radical authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License"): you may
 // not use this file except in compliance with the License. You may obtain
@@ -17,13 +17,13 @@ import (
 	"os"
 	"strings"
 
-	"github.com/beego/bee/v2/cmd/commands"
-	"github.com/beego/bee/v2/cmd/commands/version"
-	"github.com/beego/bee/v2/config"
-	"github.com/beego/bee/v2/generate"
-	"github.com/beego/bee/v2/generate/swaggergen"
-	"github.com/beego/bee/v2/logger"
-	"github.com/beego/bee/v2/utils"
+	"github.com/W3-Partha/Radical/cmd/commands"
+	"github.com/W3-Partha/Radical/cmd/commands/version"
+	"github.com/W3-Partha/Radical/config"
+	"github.com/W3-Partha/Radical/generate"
+	"github.com/W3-Partha/Radical/generate/swaggergen"
+	"github.com/W3-Partha/Radical/logger"
+	"github.com/W3-Partha/Radical/utils"
 )
 
 var CmdGenerate = &commands.Command{
@@ -31,35 +31,35 @@ var CmdGenerate = &commands.Command{
 	Short:     "Source code generator",
 	Long: `▶ {{"To scaffold out your entire application:"|bold}}
 
-     $ bee generate scaffold [scaffoldname] [-fields="title:string,body:text"] [-driver=mysql] [-conn="root:@tcp(127.0.0.1:3306)/test"]
+     $ radical generate scaffold [scaffoldname] [-fields="title:string,body:text"] [-driver=mysql] [-conn="root:@tcp(127.0.0.1:3306)/test"]
 
   ▶ {{"To generate a Model based on fields:"|bold}}
 
-     $ bee generate model [modelname] [-fields="name:type"]
+     $ radical generate model [modelname] [-fields="name:type"]
 
   ▶ {{"To generate a controller:"|bold}}
 
-     $ bee generate controller [controllerfile]
+     $ radical generate controller [controllerfile]
 
   ▶ {{"To generate a CRUD view:"|bold}}
 
-     $ bee generate view [viewpath]
+     $ radical generate view [viewpath]
 
   ▶ {{"To generate a migration file for making database schema updates:"|bold}}
 
-     $ bee generate migration [migrationfile] [-fields="name:type"]
+     $ radical generate migration [migrationfile] [-fields="name:type"]
 
   ▶ {{"To generate swagger doc file:"|bold}}
 
-     $ bee generate docs
+     $ radical generate docs
 
   ▶ {{"To generate a test case:"|bold}}
 
-     $ bee generate test [routerfile]
+     $ radical generate test [routerfile]
 
   ▶ {{"To generate appcode based on an existing database:"|bold}}
 
-     $ bee generate appcode [-tables=""] [-driver=mysql] [-conn="root:@tcp(127.0.0.1:3306)/test"] [-level=3]
+     $ radical generate appcode [-tables=""] [-driver=mysql] [-conn="root:@tcp(127.0.0.1:3306)/test"] [-level=3]
 `,
 	PreRun: func(cmd *commands.Command, args []string) { version.ShowShortVersionBanner() },
 	Run:    GenerateCode,
@@ -78,7 +78,7 @@ func init() {
 func GenerateCode(cmd *commands.Command, args []string) int {
 	currpath, _ := os.Getwd()
 	if len(args) < 1 {
-		beeLogger.Log.Fatal("Command is missing")
+		radicalLogger.Log.Fatal("Command is missing")
 	}
 
 	gcmd := args[0]
@@ -98,15 +98,15 @@ func GenerateCode(cmd *commands.Command, args []string) int {
 	case "view":
 		view(args, currpath)
 	default:
-		beeLogger.Log.Fatal("Command is missing")
+		radicalLogger.Log.Fatal("Command is missing")
 	}
-	beeLogger.Log.Successf("%s successfully generated!", strings.Title(gcmd))
+	radicalLogger.Log.Successf("%s successfully generated!", strings.Title(gcmd))
 	return 0
 }
 
 func scaffold(cmd *commands.Command, args []string, currpath string) {
 	if len(args) < 2 {
-		beeLogger.Log.Fatal("Wrong number of arguments. Run: bee help generate")
+		radicalLogger.Log.Fatal("Wrong number of arguments. Run: radical help generate")
 	}
 
 	cmd.Flag.Parse(args[2:])
@@ -123,8 +123,8 @@ func scaffold(cmd *commands.Command, args []string, currpath string) {
 		}
 	}
 	if generate.Fields == "" {
-		beeLogger.Log.Hint("Fields option should not be empty, i.e. -Fields=\"title:string,body:text\"")
-		beeLogger.Log.Fatal("Wrong number of arguments. Run: bee help generate")
+		radicalLogger.Log.Hint("Fields option should not be empty, i.e. -Fields=\"title:string,body:text\"")
+		radicalLogger.Log.Fatal("Wrong number of arguments. Run: radical help generate")
 	}
 	sname := args[1]
 	generate.GenerateScaffold(sname, generate.Fields.String(), currpath, generate.SQLDriver.String(), generate.SQLConn.String())
@@ -151,21 +151,21 @@ func appCode(cmd *commands.Command, args []string, currpath string) {
 	if generate.Level == "" {
 		generate.Level = "3"
 	}
-	beeLogger.Log.Infof("Using '%s' as 'SQLDriver'", generate.SQLDriver)
-	beeLogger.Log.Infof("Using '%s' as 'SQLConn'", generate.SQLConn)
-	beeLogger.Log.Infof("Using '%s' as 'Tables'", generate.Tables)
-	beeLogger.Log.Infof("Using '%s' as 'Level'", generate.Level)
+	radicalLogger.Log.Infof("Using '%s' as 'SQLDriver'", generate.SQLDriver)
+	radicalLogger.Log.Infof("Using '%s' as 'SQLConn'", generate.SQLConn)
+	radicalLogger.Log.Infof("Using '%s' as 'Tables'", generate.Tables)
+	radicalLogger.Log.Infof("Using '%s' as 'Level'", generate.Level)
 	generate.GenerateAppcode(generate.SQLDriver.String(), generate.SQLConn.String(), generate.Level.String(), generate.Tables.String(), currpath)
 }
 
 func migration(cmd *commands.Command, args []string, currpath string) {
 	if len(args) < 2 {
-		beeLogger.Log.Fatal("Wrong number of arguments. Run: bee help generate")
+		radicalLogger.Log.Fatal("Wrong number of arguments. Run: radical help generate")
 	}
 	cmd.Flag.Parse(args[2:])
 	mname := args[1]
 
-	beeLogger.Log.Infof("Using '%s' as migration name", mname)
+	radicalLogger.Log.Infof("Using '%s' as migration name", mname)
 
 	upsql := ""
 	downsql := ""
@@ -182,18 +182,18 @@ func controller(args []string, currpath string) {
 		cname := args[1]
 		generate.GenerateController(cname, currpath)
 	} else {
-		beeLogger.Log.Fatal("Wrong number of arguments. Run: bee help generate")
+		radicalLogger.Log.Fatal("Wrong number of arguments. Run: radical help generate")
 	}
 }
 
 func model(cmd *commands.Command, args []string, currpath string) {
 	if len(args) < 2 {
-		beeLogger.Log.Fatal("Wrong number of arguments. Run: bee help generate")
+		radicalLogger.Log.Fatal("Wrong number of arguments. Run: radical help generate")
 	}
 	cmd.Flag.Parse(args[2:])
 	if generate.Fields == "" {
-		beeLogger.Log.Hint("Fields option should not be empty, i.e. -Fields=\"title:string,body:text\"")
-		beeLogger.Log.Fatal("Wrong number of arguments. Run: bee help generate")
+		radicalLogger.Log.Hint("Fields option should not be empty, i.e. -Fields=\"title:string,body:text\"")
+		radicalLogger.Log.Fatal("Wrong number of arguments. Run: radical help generate")
 	}
 	sname := args[1]
 	generate.GenerateModel(sname, generate.Fields.String(), currpath)
@@ -204,6 +204,6 @@ func view(args []string, currpath string) {
 		cname := args[1]
 		generate.GenerateView(cname, currpath)
 	} else {
-		beeLogger.Log.Fatal("Wrong number of arguments. Run: bee help generate")
+		radicalLogger.Log.Fatal("Wrong number of arguments. Run: radical help generate")
 	}
 }

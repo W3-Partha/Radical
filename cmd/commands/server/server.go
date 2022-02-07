@@ -1,4 +1,4 @@
-// Copyright 2013 bee authors
+// Copyright 2013 radical authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License"): you may
 // not use this file except in compliance with the License. You may obtain
@@ -17,13 +17,13 @@ package apiapp
 import (
 	"net/http"
 
-	beeLogger "github.com/beego/bee/v2/logger"
+	radicalLogger "github.com/W3-Partha/Radical/logger"
 
 	"os"
 
-	"github.com/beego/bee/v2/cmd/commands"
-	"github.com/beego/bee/v2/cmd/commands/version"
-	"github.com/beego/bee/v2/utils"
+	"github.com/W3-Partha/Radical/cmd/commands"
+	"github.com/W3-Partha/Radical/cmd/commands/version"
+	"github.com/W3-Partha/Radical/utils"
 )
 
 var CmdServer = &commands.Command{
@@ -31,7 +31,7 @@ var CmdServer = &commands.Command{
 	UsageLine: "server [port]",
 	Short:     "serving static content over HTTP on port",
 	Long: `
-  The command 'server' creates a Beego API application.
+  The command 'server' creates a Radiant API application.
 `,
 	PreRun: func(cmd *commands.Command, args []string) { version.ShowShortVersionBanner() },
 	Run:    createAPI,
@@ -54,7 +54,7 @@ func createAPI(cmd *commands.Command, args []string) int {
 	if len(args) > 0 {
 		err := cmd.Flag.Parse(args[1:])
 		if err != nil {
-			beeLogger.Log.Error(err.Error())
+			radicalLogger.Log.Error(err.Error())
 		}
 	}
 	if a == "" {
@@ -67,10 +67,10 @@ func createAPI(cmd *commands.Command, args []string) int {
 		cwd, _ := os.Getwd()
 		f = utils.DocValue(cwd)
 	}
-	beeLogger.Log.Infof("Start server on http://%s:%s, static file %s", a, p, f)
+	radicalLogger.Log.Infof("Start server on http://%s:%s, static file %s", a, p, f)
 	err := http.ListenAndServe(string(a)+":"+string(p), http.FileServer(http.Dir(f)))
 	if err != nil {
-		beeLogger.Log.Error(err.Error())
+		radicalLogger.Log.Error(err.Error())
 	}
 	return 0
 }

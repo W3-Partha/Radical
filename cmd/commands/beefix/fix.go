@@ -1,24 +1,24 @@
-package beefix
+package radicalfix
 
 import (
 	"strings"
 
-	"github.com/beego/bee/v2/cmd/commands"
-	"github.com/beego/bee/v2/cmd/commands/version"
-	beeLogger "github.com/beego/bee/v2/logger"
-	"github.com/beego/bee/v2/utils"
+	"github.com/W3-Partha/Radical/cmd/commands"
+	"github.com/W3-Partha/Radical/cmd/commands/version"
+	radicalLogger "github.com/W3-Partha/Radical/logger"
+	"github.com/W3-Partha/Radical/utils"
 )
 
 var CmdFix = &commands.Command{
 	UsageLine: "fix",
-	Short:     "Fixes your application by making it compatible with newer versions of Beego",
+	Short:     "Fixes your application by making it compatible with newer versions of Radiant",
 	Long: `
   The command 'fix' will try to solve those issues by upgrading your code base
-  to be compatible  with Beego old version
+  to be compatible  with Radiant old version
   -s source version
   -t target version
 
-  example: bee fix -s 1 -t 2 means that upgrade Beego version from v1.x to v2.x
+  example: radical fix -s 1 -t 2 means that upgrade Radiant version from v1.x to v2.x
 `,
 }
 
@@ -43,6 +43,6 @@ func runFix(cmd *commands.Command, args []string) int {
 		return fix1To2()
 	}
 
-	beeLogger.Log.Info("The target is compatible version, do nothing")
+	radicalLogger.Log.Info("The target is compatible version, do nothing")
 	return 0
 }

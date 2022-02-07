@@ -1,4 +1,4 @@
-// Copyright 2013 bee authors
+// Copyright 2013 radical authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License"): you may
 // not use this file except in compliance with the License. You may obtain
@@ -11,7 +11,7 @@
 // WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 // License for the specific language governing permissions and limitations
 // under the License.
-package beeLogger
+package radicalLogger
 
 import (
 	"errors"
@@ -24,7 +24,7 @@ import (
 	"text/template"
 	"time"
 
-	"github.com/beego/bee/v2/logger/colors"
+	"github.com/W3-Partha/Radical/logger/colors"
 )
 
 var errInvalidLogLevel = errors.New("logger: invalid log level")
@@ -42,15 +42,15 @@ const (
 
 var (
 	sequenceNo uint64
-	instance   *BeeLogger
+	instance   *RadicalLogger
 	once       sync.Once
 )
 var debugMode = os.Getenv("DEBUG_ENABLED") == "1"
 
 var logLevel = levelInfo
 
-// BeeLogger logs logging records to the specified io.Writer
-type BeeLogger struct {
+// RadicalLogger logs logging records to the specified io.Writer
+type RadicalLogger struct {
 	mu     sync.Mutex
 	output io.Writer
 }
@@ -65,16 +65,16 @@ type LogRecord struct {
 	LineNo   int
 }
 
-var Log = GetBeeLogger(os.Stdout)
+var Log = GetRadicalLogger(os.Stdout)
 
 var (
 	logRecordTemplate      *template.Template
 	debugLogRecordTemplate *template.Template
 )
 
-// GetBeeLogger initializes the logger instance with a NewColorWriter output
+// GetRadicalLogger initializes the logger instance with a NewColorWriter output
 // and returns a singleton
-func GetBeeLogger(w io.Writer) *BeeLogger {
+func GetRadicalLogger(w io.Writer) *RadicalLogger {
 	once.Do(func() {
 		var (
 			err             error
@@ -96,13 +96,13 @@ func GetBeeLogger(w io.Writer) *BeeLogger {
 			panic(err)
 		}
 
-		instance = &BeeLogger{output: colors.NewColorWriter(w)}
+		instance = &RadicalLogger{output: colors.NewColorWriter(w)}
 	})
 	return instance
 }
 
 // SetOutput sets the logger output destination
-func (l *BeeLogger) SetOutput(w io.Writer) {
+func (l *RadicalLogger) SetOutput(w io.Writer) {
 	l.mu.Lock()
 	defer l.mu.Unlock()
 	l.output = colors.NewColorWriter(w)
@@ -118,7 +118,7 @@ func EndLine() string {
 	return "\n"
 }
 
-func (l *BeeLogger) getLevelTag(level int) string {
+func (l *RadicalLogger) getLevelTag(level int) string {
 	switch level {
 	case levelFatal:
 		return "FATAL   "
@@ -141,7 +141,7 @@ func (l *BeeLogger) getLevelTag(level int) string {
 	}
 }
 
-func (l *BeeLogger) getColorLevel(level int) string {
+func (l *RadicalLogger) getColorLevel(level int) string {
 	switch level {
 	case levelCritical:
 		return colors.RedBold(l.getLevelTag(level))
@@ -166,7 +166,7 @@ func (l *BeeLogger) getColorLevel(level int) string {
 
 // mustLog logs the message according to the specified level and arguments.
 // It panics in case of an error.
-func (l *BeeLogger) mustLog(level int, message string, args ...interface{}) {
+func (l *RadicalLogger) mustLog(level int, message string, args ...interface{}) {
 	if level > logLevel {
 		return
 	}
@@ -189,7 +189,7 @@ func (l *BeeLogger) mustLog(level int, message string, args ...interface{}) {
 
 // mustLogDebug logs a debug message only if debug mode
 // is enabled. i.e. DEBUG_ENABLED="1"
-func (l *BeeLogger) mustLogDebug(message string, file string, line int, args ...interface{}) {
+func (l *RadicalLogger) mustLogDebug(message string, file string, line int, args ...interface{}) {
 	if !debugMode {
 		return
 	}
@@ -212,83 +212,83 @@ func (l *BeeLogger) mustLogDebug(message string, file string, line int, args ...
 }
 
 // Debug outputs a debug log message
-func (l *BeeLogger) Debug(message string, file string, line int) {
+func (l *RadicalLogger) Debug(message string, file string, line int) {
 	l.mustLogDebug(message, file, line)
 }
 
 // Debugf outputs a formatted debug log message
-func (l *BeeLogger) Debugf(message string, file string, line int, vars ...interface{}) {
+func (l *RadicalLogger) Debugf(message string, file string, line int, vars ...interface{}) {
 	l.mustLogDebug(message, file, line, vars...)
 }
 
 // Info outputs an information log message
-func (l *BeeLogger) Info(message string) {
+func (l *RadicalLogger) Info(message string) {
 	l.mustLog(levelInfo, message)
 }
 
 // Infof outputs a formatted information log message
-func (l *BeeLogger) Infof(message string, vars ...interface{}) {
+func (l *RadicalLogger) Infof(message string, vars ...interface{}) {
 	l.mustLog(levelInfo, message, vars...)
 }
 
 // Warn outputs a warning log message
-func (l *BeeLogger) Warn(message string) {
+func (l *RadicalLogger) Warn(message string) {
 	l.mustLog(levelWarn, message)
 }
 
 // Warnf outputs a formatted warning log message
-func (l *BeeLogger) Warnf(message string, vars ...interface{}) {
+func (l *RadicalLogger) Warnf(message string, vars ...interface{}) {
 	l.mustLog(levelWarn, message, vars...)
 }
 
 // Error outputs an error log message
-func (l *BeeLogger) Error(message string) {
+func (l *RadicalLogger) Error(message string) {
 	l.mustLog(levelError, message)
 }
 
 // Errorf outputs a formatted error log message
-func (l *BeeLogger) Errorf(message string, vars ...interface{}) {
+func (l *RadicalLogger) Errorf(message string, vars ...interface{}) {
 	l.mustLog(levelError, message, vars...)
 }
 
 // Fatal outputs a fatal log message and exists
-func (l *BeeLogger) Fatal(message string) {
+func (l *RadicalLogger) Fatal(message string) {
 	l.mustLog(levelFatal, message)
 	os.Exit(255)
 }
 
 // Fatalf outputs a formatted log message and exists
-func (l *BeeLogger) Fatalf(message string, vars ...interface{}) {
+func (l *RadicalLogger) Fatalf(message string, vars ...interface{}) {
 	l.mustLog(levelFatal, message, vars...)
 	os.Exit(255)
 }
 
 // Success outputs a success log message
-func (l *BeeLogger) Success(message string) {
+func (l *RadicalLogger) Success(message string) {
 	l.mustLog(levelSuccess, message)
 }
 
 // Successf outputs a formatted success log message
-func (l *BeeLogger) Successf(message string, vars ...interface{}) {
+func (l *RadicalLogger) Successf(message string, vars ...interface{}) {
 	l.mustLog(levelSuccess, message, vars...)
 }
 
 // Hint outputs a hint log message
-func (l *BeeLogger) Hint(message string) {
+func (l *RadicalLogger) Hint(message string) {
 	l.mustLog(levelHint, message)
 }
 
 // Hintf outputs a formatted hint log message
-func (l *BeeLogger) Hintf(message string, vars ...interface{}) {
+func (l *RadicalLogger) Hintf(message string, vars ...interface{}) {
 	l.mustLog(levelHint, message, vars...)
 }
 
 // Critical outputs a critical log message
-func (l *BeeLogger) Critical(message string) {
+func (l *RadicalLogger) Critical(message string) {
 	l.mustLog(levelCritical, message)
 }
 
 // Criticalf outputs a formatted critical log message
-func (l *BeeLogger) Criticalf(message string, vars ...interface{}) {
+func (l *RadicalLogger) Criticalf(message string, vars ...interface{}) {
 	l.mustLog(levelCritical, message, vars...)
 }

@@ -1,9 +1,9 @@
-package beegopro
+package radiantpro
 
 import (
 	"strings"
 
-	"github.com/beego/bee/v2/utils"
+	"github.com/W3-Partha/Radical/utils"
 )
 
 // parse get the model info

@@ -1,4 +1,4 @@
-// Copyright 2013 bee authors
+// Copyright 2013 radical authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License"): you may
 // not use this file except in compliance with the License. You may obtain
@@ -20,25 +20,25 @@ import (
 	path "path/filepath"
 	"strings"
 
-	"github.com/beego/bee/v2/logger/colors"
+	"github.com/W3-Partha/Radical/logger/colors"
 
-	"github.com/beego/bee/v2/cmd/commands"
-	"github.com/beego/bee/v2/cmd/commands/version"
-	"github.com/beego/bee/v2/generate"
-	beeLogger "github.com/beego/bee/v2/logger"
-	"github.com/beego/bee/v2/utils"
+	"github.com/W3-Partha/Radical/cmd/commands"
+	"github.com/W3-Partha/Radical/cmd/commands/version"
+	"github.com/W3-Partha/Radical/generate"
+	radicalLogger "github.com/W3-Partha/Radical/logger"
+	"github.com/W3-Partha/Radical/utils"
 )
 
 var CmdApiapp = &commands.Command{
 	// CustomFlags: true,
 	UsageLine: "api [appname]",
-	Short:     "Creates a Beego API application",
+	Short:     "Creates a Radiant API application",
 	Long: `
-  The command 'api' creates a Beego API application.
+  The command 'api' creates a Radiant API application.
   now default supoort generate a go modules project.
 
   {{"Example:"|bold}}
-      $ bee api [appname] [-tables=""] [-driver=mysql] [-conn="root:@tcp(127.0.0.1:3306)/test"]  [-gopath=false] [-beego=v1.12.3]
+      $ radical api [appname] [-tables=""] [-driver=mysql] [-conn="root:@tcp(127.0.0.1:3306)/test"]  [-gopath=false] [-radiant=v1.12.3]
 
   If 'conn' argument is empty, the command will generate an example API application. Otherwise the command
   will connect to your database and generate models based on the existing tables.
@@ -76,15 +76,15 @@ var apiMaingo = `package main
 import (
 	_ "{{.Appname}}/routers"
 
-	beego "github.com/beego/beego/v2/server/web"
+	radiant "github.com/W3-Engineers-Ltd/Radiant/server/web"
 )
 
 func main() {
-	if beego.BConfig.RunMode == "dev" {
-		beego.BConfig.WebConfig.DirectoryIndex = true
-		beego.BConfig.WebConfig.StaticDir["/swagger"] = "swagger"
+	if radiant.BConfig.RunMode == "dev" {
+		radiant.BConfig.WebConfig.DirectoryIndex = true
+		radiant.BConfig.WebConfig.StaticDir["/swagger"] = "swagger"
 	}
-	beego.Run()
+	radiant.Run()
 }
 `
 
@@ -93,18 +93,18 @@ var apiMainconngo = `package main
 import (
 	_ "{{.Appname}}/routers"
 
-	beego "github.com/beego/beego/v2/server/web"
-	"github.com/beego/beego/v2/client/orm"
+	radiant "github.com/W3-Engineers-Ltd/Radiant/server/web"
+	"github.com/W3-Engineers-Ltd/Radiant/client/orm"
 	{{.DriverPkg}}
 )
 
 func main() {
-	orm.RegisterDataBase("default", "{{.DriverName}}", beego.AppConfig.String("sqlconn"))
-	if beego.BConfig.RunMode == "dev" {
-		beego.BConfig.WebConfig.DirectoryIndex = true
-		beego.BConfig.WebConfig.StaticDir["/swagger"] = "swagger"
+	orm.RegisterDataBase("default", "{{.DriverName}}", radiant.AppConfig.String("sqlconn"))
+	if radiant.BConfig.RunMode == "dev" {
+		radiant.BConfig.WebConfig.DirectoryIndex = true
+		radiant.BConfig.WebConfig.StaticDir["/swagger"] = "swagger"
 	}
-	beego.Run()
+	radiant.Run()
 }
 
 `
@@ -113,15 +113,15 @@ module %s
 
 go %s
 
-require github.com/beego/beego/v2 %s
+require github.com/W3-Engineers-Ltd/Radiant %s
 require github.com/smartystreets/goconvey v1.6.4
 `
 
 var apirouter = `// @APIVersion 1.0.0
-// @Title beego Test API
-// @Description beego has a very cool tools to autogenerate documents for your API
+// @Title radiant Test API
+// @Description radiant has a very cool tools to autogenerate documents for your API
 // @Contact astaxie@gmail.com
-// @TermsOfServiceUrl http://beego.me/
+// @TermsOfServiceUrl http://radiant.me/
 // @License Apache 2.0
 // @LicenseUrl http://www.apache.org/licenses/LICENSE-2.0.html
 package routers
@@ -129,23 +129,23 @@ package routers
 import (
 	"{{.Appname}}/controllers"
 
-	beego "github.com/beego/beego/v2/server/web"
+	radiant "github.com/W3-Engineers-Ltd/Radiant/server/web"
 )
 
 func init() {
-	ns := beego.NewNamespace("/v1",
-		beego.NSNamespace("/object",
-			beego.NSInclude(
+	ns := radiant.NewNamespace("/v1",
+		radiant.NSNamespace("/object",
+			radiant.NSInclude(
 				&controllers.ObjectController{},
 			),
 		),
-		beego.NSNamespace("/user",
-			beego.NSInclude(
+		radiant.NSNamespace("/user",
+			radiant.NSInclude(
 				&controllers.UserController{},
 			),
 		),
 	)
-	beego.AddNamespace(ns)
+	radiant.AddNamespace(ns)
 }
 `
 
@@ -298,12 +298,12 @@ import (
 	"{{.Appname}}/models"
 	"encoding/json"
 
-	beego "github.com/beego/beego/v2/server/web"
+	radiant "github.com/W3-Engineers-Ltd/Radiant/server/web"
 )
 
 // Operations about object
 type ObjectController struct {
-	beego.Controller
+	radiant.Controller
 }
 
 // @Title Create
@@ -391,12 +391,12 @@ import (
 	"{{.Appname}}/models"
 	"encoding/json"
 
-	beego "github.com/beego/beego/v2/server/web"
+	radiant "github.com/W3-Engineers-Ltd/Radiant/server/web"
 )
 
 // Operations about Users
 type UserController struct {
-	beego.Controller
+	radiant.Controller
 }
 
 // @Title CreateUser
@@ -516,22 +516,22 @@ import (
 	"path/filepath"
 	_ "{{.Appname}}/routers"
 
-	beego "github.com/beego/beego/v2/server/web"
-	"github.com/beego/beego/v2/core/logs"
+	radiant "github.com/W3-Engineers-Ltd/Radiant/server/web"
+	"github.com/W3-Engineers-Ltd/Radiant/core/logs"
 	. "github.com/smartystreets/goconvey/convey"
 )
 
 func init() {
 	_, file, _, _ := runtime.Caller(0)
 	apppath, _ := filepath.Abs(filepath.Dir(filepath.Join(file, ".." + string(filepath.Separator))))
-	beego.TestBeegoInit(apppath)
+	radiant.TestRadiantInit(apppath)
 }
 
 // TestGet is a sample to run an endpoint test
 func TestGet(t *testing.T) {
 	r, _ := http.NewRequest("GET", "/v1/object", nil)
 	w := httptest.NewRecorder()
-	beego.BeeApp.Handlers.ServeHTTP(w, r)
+	radiant.RadicalApp.Handlers.ServeHTTP(w, r)
 
 	logs.Info("testing", "TestGet", "Code[%d]\n%s", w.Code, w.Body.String())
 
@@ -547,14 +547,14 @@ func TestGet(t *testing.T) {
 
 `
 var gopath utils.DocValue
-var beegoVersion utils.DocValue
+var radiantVersion utils.DocValue
 
 func init() {
 	CmdApiapp.Flag.Var(&generate.Tables, "tables", "List of table names separated by a comma.")
 	CmdApiapp.Flag.Var(&generate.SQLDriver, "driver", "Database driver. Either mysql, postgres or sqlite.")
 	CmdApiapp.Flag.Var(&generate.SQLConn, "conn", "Connection string used by the driver to connect to a database instance.")
 	CmdApiapp.Flag.Var(&gopath, "gopath", "Support go path,default false")
-	CmdApiapp.Flag.Var(&beegoVersion, "beego", "set beego version,only take effect by go mod")
+	CmdApiapp.Flag.Var(&radiantVersion, "radiant", "set radiant version,only take effect by go mod")
 	commands.AvailableCommands = append(commands.AvailableCommands, CmdApiapp)
 }
 
@@ -562,37 +562,37 @@ func createAPI(cmd *commands.Command, args []string) int {
 	output := cmd.Out()
 
 	if len(args) < 1 {
-		beeLogger.Log.Fatal("Argument [appname] is missing")
+		radicalLogger.Log.Fatal("Argument [appname] is missing")
 	}
 
 	if len(args) >= 2 {
 		err := cmd.Flag.Parse(args[1:])
 		if err != nil {
-			beeLogger.Log.Fatal("Parse args err " + err.Error())
+			radicalLogger.Log.Fatal("Parse args err " + err.Error())
 		}
 	}
 	var appPath string
 	var packPath string
 	var err error
 	if gopath == `true` {
-		beeLogger.Log.Info("generate api project support GOPATH")
+		radicalLogger.Log.Info("generate api project support GOPATH")
 		version.ShowShortVersionBanner()
 		appPath, packPath, err = utils.CheckEnv(args[0])
 		if err != nil {
-			beeLogger.Log.Fatalf("%s", err)
+			radicalLogger.Log.Fatalf("%s", err)
 		}
 	} else {
-		beeLogger.Log.Info("generate api project support go modules.")
-		appPath = path.Join(utils.GetBeeWorkPath(), args[0])
+		radicalLogger.Log.Info("generate api project support go modules.")
+		appPath = path.Join(utils.GetRadicalWorkPath(), args[0])
 		packPath = args[0]
-		if beegoVersion.String() == `` {
-			beegoVersion.Set(utils.BEEGO_VERSION)
+		if radiantVersion.String() == `` {
+			radiantVersion.Set(utils.BEEGO_VERSION)
 		}
 	}
 
 	if utils.IsExist(appPath) {
-		beeLogger.Log.Errorf(colors.Bold("Application '%s' already exists"), appPath)
-		beeLogger.Log.Warn(colors.Bold("Do you want to overwrite it? [Yes|No] "))
+		radicalLogger.Log.Errorf(colors.Bold("Application '%s' already exists"), appPath)
+		radicalLogger.Log.Warn(colors.Bold("Do you want to overwrite it? [Yes|No] "))
 		if !utils.AskForConfirmation() {
 			os.Exit(2)
 		}
@@ -600,18 +600,18 @@ func createAPI(cmd *commands.Command, args []string) int {
 
 	appName := path.Base(args[0])
 	if err != nil {
-		beeLogger.Log.Fatalf("%s", err)
+		radicalLogger.Log.Fatalf("%s", err)
 	}
 	if generate.SQLDriver == "" {
 		generate.SQLDriver = "mysql"
 	}
 
-	beeLogger.Log.Info("Creating API...")
+	radicalLogger.Log.Info("Creating API...")
 
 	os.MkdirAll(appPath, 0755)
 	if gopath != `true` { //generate first for calc model name
 		fmt.Fprintf(output, "\t%s%screate%s\t %s%s\n", "\x1b[32m", "\x1b[1m", "\x1b[21m", path.Join(appPath, "go.mod"), "\x1b[0m")
-		utils.WriteToFile(path.Join(appPath, "go.mod"), fmt.Sprintf(goMod, packPath, utils.GetGoVersionSkipMinor(), beegoVersion.String()))
+		utils.WriteToFile(path.Join(appPath, "go.mod"), fmt.Sprintf(goMod, packPath, utils.GetGoVersionSkipMinor(), radiantVersion.String()))
 	}
 	fmt.Fprintf(output, "\t%s%screate%s\t %s%s\n", "\x1b[32m", "\x1b[1m", "\x1b[21m", appPath, "\x1b[0m")
 	os.Mkdir(path.Join(appPath, "conf"), 0755)
@@ -643,9 +643,9 @@ func createAPI(cmd *commands.Command, args []string) int {
 				-1,
 			),
 		)
-		beeLogger.Log.Infof("Using '%s' as 'driver'", generate.SQLDriver)
-		beeLogger.Log.Infof("Using '%s' as 'conn'", generate.SQLConn)
-		beeLogger.Log.Infof("Using '%s' as 'tables'", generate.Tables)
+		radicalLogger.Log.Infof("Using '%s' as 'driver'", generate.SQLDriver)
+		radicalLogger.Log.Infof("Using '%s' as 'conn'", generate.SQLConn)
+		radicalLogger.Log.Infof("Using '%s' as 'tables'", generate.Tables)
 		generate.GenerateAppcode(string(generate.SQLDriver), string(generate.SQLConn), "3", string(generate.Tables), appPath)
 	} else {
 		fmt.Fprintf(output, "\t%s%screate%s\t %s%s\n", "\x1b[32m", "\x1b[1m", "\x1b[21m", path.Join(appPath, "conf", "app.conf"), "\x1b[0m")
@@ -684,6 +684,6 @@ func createAPI(cmd *commands.Command, args []string) int {
 		utils.WriteToFile(path.Join(appPath, "main.go"),
 			strings.Replace(apiMaingo, "{{.Appname}}", packPath, -1))
 	}
-	beeLogger.Log.Success("New API successfully created!")
+	radicalLogger.Log.Success("New API successfully created!")
 	return 0
 }

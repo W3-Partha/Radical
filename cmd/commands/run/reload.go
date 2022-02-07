@@ -1,4 +1,4 @@
-// Copyright 2017 bee authors
+// Copyright 2017 radical authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License"): you may
 // not use this file except in compliance with the License. You may obtain
@@ -18,7 +18,7 @@ import (
 	"net/http"
 	"time"
 
-	beeLogger "github.com/beego/bee/v2/logger"
+	radicalLogger "github.com/W3-Partha/Radical/logger"
 	"github.com/gorilla/websocket"
 )
 
@@ -71,7 +71,7 @@ func (c *wsClient) readPump() {
 		_, _, err := c.conn.ReadMessage()
 		if err != nil {
 			if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway) {
-				beeLogger.Log.Errorf("An error happened when reading from the Websocket client: %v", err)
+				radicalLogger.Log.Errorf("An error happened when reading from the Websocket client: %v", err)
 			}
 			break
 		}
@@ -156,13 +156,13 @@ func startReloadServer() {
 	})
 
 	go startServer()
-	beeLogger.Log.Infof("Reload server listening at %s", reloadAddress)
+	radicalLogger.Log.Infof("Reload server listening at %s", reloadAddress)
 }
 
 func startServer() {
 	err := http.ListenAndServe(reloadAddress, nil)
 	if err != nil {
-		beeLogger.Log.Errorf("Failed to start up the Reload server: %v", err)
+		radicalLogger.Log.Errorf("Failed to start up the Reload server: %v", err)
 		return
 	}
 }
@@ -176,7 +176,7 @@ func sendReload(payload string) {
 func handleWsRequest(broker *wsBroker, w http.ResponseWriter, r *http.Request) {
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
-		beeLogger.Log.Errorf("error while upgrading server connection: %v", err)
+		radicalLogger.Log.Errorf("error while upgrading server connection: %v", err)
 		return
 	}
 

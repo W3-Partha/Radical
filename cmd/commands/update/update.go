@@ -5,18 +5,18 @@ import (
 	"os"
 	"os/exec"
 
-	"github.com/beego/bee/v2/cmd/commands"
-	"github.com/beego/bee/v2/config"
-	beeLogger "github.com/beego/bee/v2/logger"
+	"github.com/W3-Partha/Radical/cmd/commands"
+	"github.com/W3-Partha/Radical/config"
+	radicalLogger "github.com/W3-Partha/Radical/logger"
 )
 
 var CmdUpdate = &commands.Command{
 	UsageLine: "update",
-	Short:     "Update Bee",
+	Short:     "Update Radical",
 	Long: `
-Automatic run command "go get -u github.com/beego/bee/v2" for selfupdate
+Automatic run command "go get -u github.com/W3-Partha/Radical" for selfupdate
 `,
-	Run: updateBee,
+	Run: updateRadical,
 }
 
 func init() {
@@ -25,14 +25,14 @@ func init() {
 	commands.AvailableCommands = append(commands.AvailableCommands, CmdUpdate)
 }
 
-func updateBee(cmd *commands.Command, args []string) int {
-	beeLogger.Log.Info("Updating")
-	beePath := config.GitRemotePath
-	cmdUp := exec.Command("go", "get", "-u", beePath)
+func updateRadical(cmd *commands.Command, args []string) int {
+	radicalLogger.Log.Info("Updating")
+	radicalPath := config.GitRemotePath
+	cmdUp := exec.Command("go", "get", "-u", radicalPath)
 	cmdUp.Stdout = os.Stdout
 	cmdUp.Stderr = os.Stderr
 	if err := cmdUp.Run(); err != nil {
-		beeLogger.Log.Warnf("Run cmd err:%s", err)
+		radicalLogger.Log.Warnf("Run cmd err:%s", err)
 	}
 	return 0
 }

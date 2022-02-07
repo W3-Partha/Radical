@@ -1,4 +1,4 @@
-// Copyright 2013 bee authors
+// Copyright 2013 radical authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License"): you may
 // not use this file except in compliance with the License. You may obtain
@@ -25,9 +25,9 @@ import (
 	"regexp"
 	"strings"
 
-	beeLogger "github.com/beego/bee/v2/logger"
-	"github.com/beego/bee/v2/logger/colors"
-	"github.com/beego/bee/v2/utils"
+	radicalLogger "github.com/W3-Partha/Radical/logger"
+	"github.com/W3-Partha/Radical/logger/colors"
+	"github.com/W3-Partha/Radical/utils"
 	_ "github.com/go-sql-driver/mysql"
 	_ "github.com/lib/pq"
 )
@@ -165,7 +165,7 @@ type ForeignKey struct {
 	RefColumn string
 }
 
-// OrmTag contains Beego ORM tag information for a column
+// OrmTag contains Radiant ORM tag information for a column
 type OrmTag struct {
 	Auto        bool
 	Pk          bool
@@ -275,7 +275,7 @@ func GenerateAppcode(driver, connStr, level, tables, currpath string) {
 	case "3":
 		mode = OModel | OController | ORouter
 	default:
-		beeLogger.Log.Fatal("Invalid level value. Must be either \"1\", \"2\", or \"3\"")
+		radicalLogger.Log.Fatal("Invalid level value. Must be either \"1\", \"2\", or \"3\"")
 	}
 	var selectedTables map[string]bool
 	if tables != "" {
@@ -288,9 +288,9 @@ func GenerateAppcode(driver, connStr, level, tables, currpath string) {
 	case "mysql":
 	case "postgres":
 	case "sqlite":
-		beeLogger.Log.Fatal("Generating app code from SQLite database is not supported yet.")
+		radicalLogger.Log.Fatal("Generating app code from SQLite database is not supported yet.")
 	default:
-		beeLogger.Log.Fatal("Unknown database driver. Must be either \"mysql\", \"postgres\" or \"sqlite\"")
+		radicalLogger.Log.Fatal("Unknown database driver. Must be either \"mysql\", \"postgres\" or \"sqlite\"")
 	}
 	gen(driver, connStr, mode, selectedTables, currpath)
 }
@@ -300,11 +300,11 @@ func GenerateAppcode(driver, connStr, level, tables, currpath string) {
 func gen(dbms, connStr string, mode byte, selectedTableNames map[string]bool, apppath string) {
 	db, err := sql.Open(dbms, connStr)
 	if err != nil {
-		beeLogger.Log.Fatalf("Could not connect to '%s' database using '%s': %s", dbms, connStr, err)
+		radicalLogger.Log.Fatalf("Could not connect to '%s' database using '%s': %s", dbms, connStr, err)
 	}
 	defer db.Close()
 	if trans, ok := dbDriver[dbms]; ok {
-		beeLogger.Log.Info("Analyzing database tables...")
+		radicalLogger.Log.Info("Analyzing database tables...")
 		var tableNames []string
 		if len(selectedTableNames) != 0 {
 			for tableName := range selectedTableNames {
@@ -322,7 +322,7 @@ func gen(dbms, connStr string, mode byte, selectedTableNames map[string]bool, ap
 		pkgPath := getPackagePath(apppath)
 		writeSourceFiles(pkgPath, tables, mode, mvcPath)
 	} else {
-		beeLogger.Log.Fatalf("Generating app code from '%s' database is not supported yet.", dbms)
+		radicalLogger.Log.Fatalf("Generating app code from '%s' database is not supported yet.", dbms)
 	}
 }
 
@@ -330,13 +330,13 @@ func gen(dbms, connStr string, mode byte, selectedTableNames map[string]bool, ap
 func (*MysqlDB) GetTableNames(db *sql.DB) (tables []string) {
 	rows, err := db.Query("SHOW TABLES")
 	if err != nil {
-		beeLogger.Log.Fatalf("Could not show tables: %s", err)
+		radicalLogger.Log.Fatalf("Could not show tables: %s", err)
 	}
 	defer rows.Close()
 	for rows.Next() {
 		var name string
 		if err := rows.Scan(&name); err != nil {
-			beeLogger.Log.Fatalf("Could not show tables: %s", err)
+			radicalLogger.Log.Fatalf("Could not show tables: %s", err)
 		}
 		tables = append(tables, name)
 	}
@@ -379,12 +379,12 @@ func (*MysqlDB) GetConstraints(db *sql.DB, table *Table, blackList map[string]bo
 			c.table_schema = database() AND c.table_name = ? AND u.table_schema = database() AND u.table_name = ?`,
 		table.Name, table.Name) //  u.position_in_unique_constraint,
 	if err != nil {
-		beeLogger.Log.Fatal("Could not query INFORMATION_SCHEMA for PK/UK/FK information")
+		radicalLogger.Log.Fatal("Could not query INFORMATION_SCHEMA for PK/UK/FK information")
 	}
 	for rows.Next() {
 		var constraintTypeBytes, columnNameBytes, refTableSchemaBytes, refTableNameBytes, refColumnNameBytes, refOrdinalPosBytes []byte
 		if err := rows.Scan(&constraintTypeBytes, &columnNameBytes, &refTableSchemaBytes, &refTableNameBytes, &refColumnNameBytes, &refOrdinalPosBytes); err != nil {
-			beeLogger.Log.Fatal("Could not read INFORMATION_SCHEMA for PK/UK/FK information")
+			radicalLogger.Log.Fatal("Could not read INFORMATION_SCHEMA for PK/UK/FK information")
 		}
 		constraintType, columnName, refTableSchema, refTableName, refColumnName, refOrdinalPos :=
 			string(constraintTypeBytes), string(columnNameBytes), string(refTableSchemaBytes),
@@ -424,7 +424,7 @@ func (mysqlDB *MysqlDB) GetColumns(db *sql.DB, table *Table, blackList map[strin
 			table_schema = database() AND table_name = ?`,
 		table.Name)
 	if err != nil {
-		beeLogger.Log.Fatalf("Could not query the database: %s", err)
+		radicalLogger.Log.Fatalf("Could not query the database: %s", err)
 	}
 	defer colDefRows.Close()
 
@@ -432,7 +432,7 @@ func (mysqlDB *MysqlDB) GetColumns(db *sql.DB, table *Table, blackList map[strin
 		// datatype as bytes so that SQL <null> values can be retrieved
 		var colNameBytes, dataTypeBytes, columnTypeBytes, isNullableBytes, columnDefaultBytes, extraBytes, columnCommentBytes []byte
 		if err := colDefRows.Scan(&colNameBytes, &dataTypeBytes, &columnTypeBytes, &isNullableBytes, &columnDefaultBytes, &extraBytes, &columnCommentBytes); err != nil {
-			beeLogger.Log.Fatal("Could not query INFORMATION_SCHEMA for column information")
+			radicalLogger.Log.Fatal("Could not query INFORMATION_SCHEMA for column information")
 		}
 		colName, dataType, columnType, isNullable, columnDefault, extra, columnComment :=
 			string(colNameBytes), string(dataTypeBytes), string(columnTypeBytes), string(isNullableBytes), string(columnDefaultBytes), string(extraBytes), string(columnCommentBytes)
@@ -442,7 +442,7 @@ func (mysqlDB *MysqlDB) GetColumns(db *sql.DB, table *Table, blackList map[strin
 		col.Name = utils.CamelCase(colName)
 		col.Type, err = mysqlDB.GetGoDataType(dataType)
 		if err != nil {
-			beeLogger.Log.Fatalf("%s", err)
+			radicalLogger.Log.Fatalf("%s", err)
 		}
 
 		// Tag info
@@ -482,7 +482,7 @@ func (mysqlDB *MysqlDB) GetColumns(db *sql.DB, table *Table, blackList map[strin
 					if sign == "unsigned" && extra != "auto_increment" {
 						col.Type, err = mysqlDB.GetGoDataType(dataType + " " + sign)
 						if err != nil {
-							beeLogger.Log.Fatalf("%s", err)
+							radicalLogger.Log.Fatalf("%s", err)
 						}
 					}
 				}
@@ -532,14 +532,14 @@ func (*PostgresDB) GetTableNames(db *sql.DB) (tables []string) {
 		table_type = 'BASE TABLE' AND
 		table_schema NOT IN ('pg_catalog', 'information_schema')`)
 	if err != nil {
-		beeLogger.Log.Fatalf("Could not show tables: %s", err)
+		radicalLogger.Log.Fatalf("Could not show tables: %s", err)
 	}
 	defer rows.Close()
 
 	for rows.Next() {
 		var name string
 		if err := rows.Scan(&name); err != nil {
-			beeLogger.Log.Fatalf("Could not show tables: %s", err)
+			radicalLogger.Log.Fatalf("Could not show tables: %s", err)
 		}
 		tables = append(tables, name)
 	}
@@ -569,13 +569,13 @@ func (*PostgresDB) GetConstraints(db *sql.DB, table *Table, blackList map[string
 			 AND u.table_name = $2`,
 		table.Name, table.Name) //  u.position_in_unique_constraint,
 	if err != nil {
-		beeLogger.Log.Fatalf("Could not query INFORMATION_SCHEMA for PK/UK/FK information: %s", err)
+		radicalLogger.Log.Fatalf("Could not query INFORMATION_SCHEMA for PK/UK/FK information: %s", err)
 	}
 
 	for rows.Next() {
 		var constraintTypeBytes, columnNameBytes, refTableSchemaBytes, refTableNameBytes, refColumnNameBytes, refOrdinalPosBytes []byte
 		if err := rows.Scan(&constraintTypeBytes, &columnNameBytes, &refTableSchemaBytes, &refTableNameBytes, &refColumnNameBytes, &refOrdinalPosBytes); err != nil {
-			beeLogger.Log.Fatalf("Could not read INFORMATION_SCHEMA for PK/UK/FK information: %s", err)
+			radicalLogger.Log.Fatalf("Could not read INFORMATION_SCHEMA for PK/UK/FK information: %s", err)
 		}
 		constraintType, columnName, refTableSchema, refTableName, refColumnName, refOrdinalPos :=
 			string(constraintTypeBytes), string(columnNameBytes), string(refTableSchemaBytes),
@@ -625,7 +625,7 @@ func (postgresDB *PostgresDB) GetColumns(db *sql.DB, table *Table, blackList map
 			 AND table_name = $1`,
 		table.Name)
 	if err != nil {
-		beeLogger.Log.Fatalf("Could not query INFORMATION_SCHEMA for column information: %s", err)
+		radicalLogger.Log.Fatalf("Could not query INFORMATION_SCHEMA for column information: %s", err)
 	}
 	defer colDefRows.Close()
 
@@ -633,7 +633,7 @@ func (postgresDB *PostgresDB) GetColumns(db *sql.DB, table *Table, blackList map
 		// datatype as bytes so that SQL <null> values can be retrieved
 		var colNameBytes, dataTypeBytes, columnTypeBytes, isNullableBytes, columnDefaultBytes, extraBytes []byte
 		if err := colDefRows.Scan(&colNameBytes, &dataTypeBytes, &columnTypeBytes, &isNullableBytes, &columnDefaultBytes, &extraBytes); err != nil {
-			beeLogger.Log.Fatalf("Could not query INFORMATION_SCHEMA for column information: %s", err)
+			radicalLogger.Log.Fatalf("Could not query INFORMATION_SCHEMA for column information: %s", err)
 		}
 		colName, dataType, columnType, isNullable, columnDefault, extra :=
 			string(colNameBytes), string(dataTypeBytes), string(columnTypeBytes), string(isNullableBytes), string(columnDefaultBytes), string(extraBytes)
@@ -642,7 +642,7 @@ func (postgresDB *PostgresDB) GetColumns(db *sql.DB, table *Table, blackList map
 		col.Name = utils.CamelCase(colName)
 		col.Type, err = postgresDB.GetGoDataType(dataType)
 		if err != nil {
-			beeLogger.Log.Fatalf("%s", err)
+			radicalLogger.Log.Fatalf("%s", err)
 		}
 
 		// Tag info
@@ -732,15 +732,15 @@ func createPaths(mode byte, paths *MvcPath) {
 // Newly geneated files will be inside these folders.
 func writeSourceFiles(pkgPath string, tables []*Table, mode byte, paths *MvcPath) {
 	if (OModel & mode) == OModel {
-		beeLogger.Log.Info("Creating model files...")
+		radicalLogger.Log.Info("Creating model files...")
 		writeModelFiles(tables, paths.ModelPath)
 	}
 	if (OController & mode) == OController {
-		beeLogger.Log.Info("Creating controller files...")
+		radicalLogger.Log.Info("Creating controller files...")
 		writeControllerFiles(tables, paths.ControllerPath, pkgPath)
 	}
 	if (ORouter & mode) == ORouter {
-		beeLogger.Log.Info("Creating router files...")
+		radicalLogger.Log.Info("Creating router files...")
 		writeRouterFile(tables, paths.RouterPath, pkgPath)
 	}
 }
@@ -755,21 +755,21 @@ func writeModelFiles(tables []*Table, mPath string) {
 		var f *os.File
 		var err error
 		if utils.IsExist(fpath) {
-			beeLogger.Log.Warnf("'%s' already exists. Do you want to overwrite it? [Yes|No] ", fpath)
+			radicalLogger.Log.Warnf("'%s' already exists. Do you want to overwrite it? [Yes|No] ", fpath)
 			if utils.AskForConfirmation() {
 				f, err = os.OpenFile(fpath, os.O_RDWR|os.O_TRUNC, 0666)
 				if err != nil {
-					beeLogger.Log.Warnf("%s", err)
+					radicalLogger.Log.Warnf("%s", err)
 					continue
 				}
 			} else {
-				beeLogger.Log.Warnf("Skipped create file '%s'", fpath)
+				radicalLogger.Log.Warnf("Skipped create file '%s'", fpath)
 				continue
 			}
 		} else {
 			f, err = os.OpenFile(fpath, os.O_CREATE|os.O_RDWR, 0666)
 			if err != nil {
-				beeLogger.Log.Warnf("%s", err)
+				radicalLogger.Log.Warnf("%s", err)
 				continue
 			}
 		}
@@ -793,7 +793,7 @@ func writeModelFiles(tables []*Table, mPath string) {
 		fileStr = strings.Replace(fileStr, "{{timePkg}}", timePkg, -1)
 		fileStr = strings.Replace(fileStr, "{{importTimePkg}}", importTimePkg, -1)
 		if _, err := f.WriteString(fileStr); err != nil {
-			beeLogger.Log.Fatalf("Could not write model file to '%s': %s", fpath, err)
+			radicalLogger.Log.Fatalf("Could not write model file to '%s': %s", fpath, err)
 		}
 		utils.CloseFile(f)
 		fmt.Fprintf(w, "\t%s%screate%s\t %s%s\n", "\x1b[32m", "\x1b[1m", "\x1b[21m", fpath, "\x1b[0m")
@@ -814,28 +814,28 @@ func writeControllerFiles(tables []*Table, cPath string, pkgPath string) {
 		var f *os.File
 		var err error
 		if utils.IsExist(fpath) {
-			beeLogger.Log.Warnf("'%s' already exists. Do you want to overwrite it? [Yes|No] ", fpath)
+			radicalLogger.Log.Warnf("'%s' already exists. Do you want to overwrite it? [Yes|No] ", fpath)
 			if utils.AskForConfirmation() {
 				f, err = os.OpenFile(fpath, os.O_RDWR|os.O_TRUNC, 0666)
 				if err != nil {
-					beeLogger.Log.Warnf("%s", err)
+					radicalLogger.Log.Warnf("%s", err)
 					continue
 				}
 			} else {
-				beeLogger.Log.Warnf("Skipped create file '%s'", fpath)
+				radicalLogger.Log.Warnf("Skipped create file '%s'", fpath)
 				continue
 			}
 		} else {
 			f, err = os.OpenFile(fpath, os.O_CREATE|os.O_RDWR, 0666)
 			if err != nil {
-				beeLogger.Log.Warnf("%s", err)
+				radicalLogger.Log.Warnf("%s", err)
 				continue
 			}
 		}
 		fileStr := strings.Replace(CtrlTPL, "{{ctrlName}}", utils.CamelCase(tb.Name), -1)
 		fileStr = strings.Replace(fileStr, "{{pkgPath}}", pkgPath, -1)
 		if _, err := f.WriteString(fileStr); err != nil {
-			beeLogger.Log.Fatalf("Could not write controller file to '%s': %s", fpath, err)
+			radicalLogger.Log.Fatalf("Could not write controller file to '%s': %s", fpath, err)
 		}
 		utils.CloseFile(f)
 		fmt.Fprintf(w, "\t%s%screate%s\t %s%s\n", "\x1b[32m", "\x1b[1m", "\x1b[21m", fpath, "\x1b[0m")
@@ -864,26 +864,26 @@ func writeRouterFile(tables []*Table, rPath string, pkgPath string) {
 	var f *os.File
 	var err error
 	if utils.IsExist(fpath) {
-		beeLogger.Log.Warnf("'%s' already exists. Do you want to overwrite it? [Yes|No] ", fpath)
+		radicalLogger.Log.Warnf("'%s' already exists. Do you want to overwrite it? [Yes|No] ", fpath)
 		if utils.AskForConfirmation() {
 			f, err = os.OpenFile(fpath, os.O_RDWR|os.O_TRUNC, 0666)
 			if err != nil {
-				beeLogger.Log.Warnf("%s", err)
+				radicalLogger.Log.Warnf("%s", err)
 				return
 			}
 		} else {
-			beeLogger.Log.Warnf("Skipped create file '%s'", fpath)
+			radicalLogger.Log.Warnf("Skipped create file '%s'", fpath)
 			return
 		}
 	} else {
 		f, err = os.OpenFile(fpath, os.O_CREATE|os.O_RDWR, 0666)
 		if err != nil {
-			beeLogger.Log.Warnf("%s", err)
+			radicalLogger.Log.Warnf("%s", err)
 			return
 		}
 	}
 	if _, err := f.WriteString(routerStr); err != nil {
-		beeLogger.Log.Fatalf("Could not write router file to '%s': %s", fpath, err)
+		radicalLogger.Log.Fatalf("Could not write router file to '%s': %s", fpath, err)
 	}
 	utils.CloseFile(f)
 	fmt.Fprintf(w, "\t%s%screate%s\t %s%s\n", "\x1b[32m", "\x1b[1m", "\x1b[21m", fpath, "\x1b[0m")
@@ -954,14 +954,14 @@ func getPackagePath(curpath string) (packpath string) {
 		gomodpath := filepath.Join(curpath, `go.mod`)
 		re, err := regexp.Compile(`^module\s+(.+)$`)
 		if err != nil {
-			beeLogger.Log.Error(info)
-			beeLogger.Log.Fatalf("try `go.mod` generate regexp error:%s", err)
+			radicalLogger.Log.Error(info)
+			radicalLogger.Log.Fatalf("try `go.mod` generate regexp error:%s", err)
 			return ""
 		}
 		fd, err := os.Open(gomodpath)
 		if err != nil {
-			beeLogger.Log.Error(info)
-			beeLogger.Log.Fatalf("try `go.mod`  Error while reading 'go.mod',%s", gomodpath)
+			radicalLogger.Log.Error(info)
+			radicalLogger.Log.Fatalf("try `go.mod`  Error while reading 'go.mod',%s", gomodpath)
 		}
 		reader := bufio.NewReader(fd)
 		for {
@@ -978,10 +978,10 @@ func getPackagePath(curpath string) (packpath string) {
 				return s[1]
 			}
 		}
-		beeLogger.Log.Error(info)
-		beeLogger.Log.Fatalf("try `go.mod` Error while parse 'go.mod',%s", gomodpath)
+		radicalLogger.Log.Error(info)
+		radicalLogger.Log.Fatalf("try `go.mod` Error while parse 'go.mod',%s", gomodpath)
 	} else {
-		beeLogger.Log.Debugf("GOPATH: %s", utils.FILE(), utils.LINE(), gopath)
+		radicalLogger.Log.Debugf("GOPATH: %s", utils.FILE(), utils.LINE(), gopath)
 	}
 
 	appsrcpath := ""
@@ -998,11 +998,11 @@ func getPackagePath(curpath string) (packpath string) {
 	}
 
 	if !haspath {
-		beeLogger.Log.Fatalf("Cannot generate application code outside of GOPATH '%s' compare with CWD '%s'", gopath, curpath)
+		radicalLogger.Log.Fatalf("Cannot generate application code outside of GOPATH '%s' compare with CWD '%s'", gopath, curpath)
 	}
 
 	if curpath == appsrcpath {
-		beeLogger.Log.Fatal("Cannot generate application code outside of application path")
+		radicalLogger.Log.Fatal("Cannot generate application code outside of application path")
 	}
 
 	packpath = strings.Join(strings.Split(curpath[len(appsrcpath)+1:], string(filepath.Separator)), "/")
@@ -1023,7 +1023,7 @@ import (
 	"reflect"
 	"strings"
 	{{timePkg}}
-	"github.com/beego/beego/v2/client/orm"
+	"github.com/W3-Engineers-Ltd/Radiant/client/orm"
 )
 
 {{modelStruct}}
@@ -1172,12 +1172,12 @@ import (
 	"strconv"
 	"strings"
 
-	beego "github.com/beego/beego/v2/server/web"
+	radiant "github.com/W3-Engineers-Ltd/Radiant/server/web"
 )
 
 // {{ctrlName}}Controller operations for {{ctrlName}}
 type {{ctrlName}}Controller struct {
-	beego.Controller
+	radiant.Controller
 }
 
 // URLMapping ...
@@ -1336,10 +1336,10 @@ func (c *{{ctrlName}}Controller) Delete() {
 }
 `
 	RouterTPL = `// @APIVersion 1.0.0
-// @Title beego Test API
-// @Description beego has a very cool tools to autogenerate documents for your API
+// @Title radiant Test API
+// @Description radiant has a very cool tools to autogenerate documents for your API
 // @Contact astaxie@gmail.com
-// @TermsOfServiceUrl http://beego.me/
+// @TermsOfServiceUrl http://radiant.me/
 // @License Apache 2.0
 // @LicenseUrl http://www.apache.org/licenses/LICENSE-2.0.html
 package routers
@@ -1347,19 +1347,19 @@ package routers
 import (
 	"{{pkgPath}}/controllers"
 
-	beego "github.com/beego/beego/v2/server/web"
+	radiant "github.com/W3-Engineers-Ltd/Radiant/server/web"
 )
 
 func init() {
-	ns := beego.NewNamespace("/v1",
+	ns := radiant.NewNamespace("/v1",
 		{{nameSpaces}}
 	)
-	beego.AddNamespace(ns)
+	radiant.AddNamespace(ns)
 }
 `
 	NamespaceTPL = `
-		beego.NSNamespace("/{{nameSpace}}",
-			beego.NSInclude(
+		radiant.NSNamespace("/{{nameSpace}}",
+			radiant.NSInclude(
 				&controllers.{{ctrlName}}Controller{},
 			),
 		),

@@ -1,11 +1,11 @@
 
-bee
+radical
 ===
 
-Bee is a command-line tool facilitating development of Beego-based application.
+Radical is a command-line tool facilitating development of Radiant-based application.
 
-[![Build Status](https://img.shields.io/travis/beego/bee.svg?branch=master&label=master)](https://travis-ci.org/beego/bee)
-[![Build Status](https://img.shields.io/travis/beego/bee.svg?branch=develop&label=develop)](https://travis-ci.org/beego/bee)
+[![Build Status](https://img.shields.io/travis/radiant/radical.svg?branch=master&label=master)](https://travis-ci.org/radiant/radical)
+[![Build Status](https://img.shields.io/travis/radiant/radical.svg?branch=develop&label=develop)](https://travis-ci.org/radiant/radical)
 
 ## Requirements
 
@@ -13,51 +13,51 @@ Bee is a command-line tool facilitating development of Beego-based application.
 
 ## Installation
 
-To install `bee` use the `go get` command:
+To install `radical` use the `go get` command:
 
 ```bash
-go get github.com/beego/bee/v2
+go get github.com/W3-Partha/Radical
 ```
 
-Then you can add `bee` binary to PATH environment variable in your `~/.bashrc` or `~/.bash_profile` file:
+Then you can add `radical` binary to PATH environment variable in your `~/.bashrc` or `~/.bash_profile` file:
 
 ```bash
 export PATH=$PATH:<your_main_gopath>/bin
 ```
 
-> If you already have `bee` installed, updating `bee` is simple:
+> If you already have `radical` installed, updating `radical` is simple:
 
 ```bash
-go get -u github.com/beego/bee/v2
+go get -u github.com/W3-Partha/Radical
 ```
 
 ## Basic commands
 
-Bee provides a variety of commands which can be helpful at various stages of development. The top level commands include:
+Radical provides a variety of commands which can be helpful at various stages of development. The top level commands include:
 
 ```
-    version     Prints the current Bee version
+    version     Prints the current Radical version
     migrate     Runs database migrations
-    api         Creates a Beego API application
+    api         Creates a Radiant API application
     bale        Transforms non-Go files to Go source files
-    fix         Fixes your application by making it compatible with newer versions of Beego
+    fix         Fixes your application by making it compatible with newer versions of Radiant
     dlv         Start a debugging session using Delve
-    dockerize   Generates a Dockerfile for your Beego application
+    dockerize   Generates a Dockerfile for your Radiant application
     generate    Source code generator
-    hprose      Creates an RPC application based on Hprose and Beego frameworks
-    new         Creates a Beego application
-    pack        Compresses a Beego application into a single file
+    hprose      Creates an RPC application based on Hprose and Radiant frameworks
+    new         Creates a Radiant application
+    pack        Compresses a Radiant application into a single file
     rs          Run customized scripts
     run         Run the application by starting a local development server
 
 ```
 
-### bee version
+### radical version
 
-To display the current version of `bee`, `beego` and `go` installed on your machine:
+To display the current version of `radical`, `radiant` and `go` installed on your machine:
 
 ```bash
-$ bee version
+$ radical version
 ______
 | ___ \
 | |_/ /  ___   ___
@@ -65,12 +65,12 @@ ______
 | |_/ /|  __/|  __/
 \____/  \___| \___| v1.6.2
 
-├── Beego     : 1.7.2
+├── Radiant     : 1.7.2
 ├── GoVersion : go1.7.4
 ├── GOOS      : linux
 ├── GOARCH    : amd64
 ├── NumCPU    : 2
-├── GOPATH    : /home/beeuser/.go
+├── GOPATH    : /home/radicaluser/.go
 ├── GOROOT    : /usr/lib/go
 ├── Compiler  : gc
 └── Date      : Monday, 26 Dec 2016
@@ -79,28 +79,28 @@ ______
 You can also change the output format using `-o` flag:
 
 ```bash
-$ bee version -o json
+$ radical version -o json
 {
     "GoVersion": "go1.7.4",
     "GOOS": "linux",
     "GOARCH": "amd64",
     "NumCPU": 2,
-    "GOPATH": "/home/beeuser/.go",
+    "GOPATH": "/home/radicaluser/.go",
     "GOROOT": "/usr/lib/go",
     "Compiler": "gc",
-    "BeeVersion": "1.6.2",
-    "BeegoVersion": "1.7.2"
+    "RadicalVersion": "1.6.2",
+    "RadiantVersion": "1.7.2"
 }
 ```
 
-For more information on the usage, run `bee help version`.
+For more information on the usage, run `radical help version`.
 
-### bee new
+### radical new
 
-To create a new Beego web application:
+To create a new Radiant web application:
 
 ```bash
-$ bee new my-web-app
+$ radical new my-web-app
 ______
 | ___ \
 | |_/ /  ___   ___
@@ -108,86 +108,86 @@ ______
 | |_/ /|  __/|  __/
 \____/  \___| \___| v1.6.2
 2016/12/26 22:28:11 INFO     ▶ 0001 Creating application...
-    create   /home/beeuser/.go/src/github.com/user/my-web-app/
-    create   /home/beeuser/.go/src/github.com/user/my-web-app/conf/
-    create   /home/beeuser/.go/src/github.com/user/my-web-app/controllers/
-    create   /home/beeuser/.go/src/github.com/user/my-web-app/models/
-    create   /home/beeuser/.go/src/github.com/user/my-web-app/routers/
-    create   /home/beeuser/.go/src/github.com/user/my-web-app/tests/
-    create   /home/beeuser/.go/src/github.com/user/my-web-app/static/
-    create   /home/beeuser/.go/src/github.com/user/my-web-app/static/js/
-    create   /home/beeuser/.go/src/github.com/user/my-web-app/static/css/
-    create   /home/beeuser/.go/src/github.com/user/my-web-app/static/img/
-    create   /home/beeuser/.go/src/github.com/user/my-web-app/views/
-    create   /home/beeuser/.go/src/github.com/user/my-web-app/conf/app.conf
-    create   /home/beeuser/.go/src/github.com/user/my-web-app/controllers/default.go
-    create   /home/beeuser/.go/src/github.com/user/my-web-app/views/index.tpl
-    create   /home/beeuser/.go/src/github.com/user/my-web-app/routers/router.go
-    create   /home/beeuser/.go/src/github.com/user/my-web-app/tests/default_test.go
-    create   /home/beeuser/.go/src/github.com/user/my-web-app/main.go
+    create   /home/radicaluser/.go/src/github.com/user/my-web-app/
+    create   /home/radicaluser/.go/src/github.com/user/my-web-app/conf/
+    create   /home/radicaluser/.go/src/github.com/user/my-web-app/controllers/
+    create   /home/radicaluser/.go/src/github.com/user/my-web-app/models/
+    create   /home/radicaluser/.go/src/github.com/user/my-web-app/routers/
+    create   /home/radicaluser/.go/src/github.com/user/my-web-app/tests/
+    create   /home/radicaluser/.go/src/github.com/user/my-web-app/static/
+    create   /home/radicaluser/.go/src/github.com/user/my-web-app/static/js/
+    create   /home/radicaluser/.go/src/github.com/user/my-web-app/static/css/
+    create   /home/radicaluser/.go/src/github.com/user/my-web-app/static/img/
+    create   /home/radicaluser/.go/src/github.com/user/my-web-app/views/
+    create   /home/radicaluser/.go/src/github.com/user/my-web-app/conf/app.conf
+    create   /home/radicaluser/.go/src/github.com/user/my-web-app/controllers/default.go
+    create   /home/radicaluser/.go/src/github.com/user/my-web-app/views/index.tpl
+    create   /home/radicaluser/.go/src/github.com/user/my-web-app/routers/router.go
+    create   /home/radicaluser/.go/src/github.com/user/my-web-app/tests/default_test.go
+    create   /home/radicaluser/.go/src/github.com/user/my-web-app/main.go
 2016/12/26 22:28:11 SUCCESS  ▶ 0002 New application successfully created!
 ```
 
-For more information on the usage, run `bee help new`.
+For more information on the usage, run `radical help new`.
 
-### bee run
+### radical run
 
 To run the application we just created, you can navigate to the application folder and execute:
 
 ```bash
-$ cd my-web-app && bee run
+$ cd my-web-app && radical run
 ```
 
 Or from anywhere in your machine:
 
 ```
-$ bee run github.com/user/my-web-app
+$ radical run github.com/user/my-web-app
 ```
 
-For more information on the usage, run `bee help run`.
+For more information on the usage, run `radical help run`.
 
-### bee pack
+### radical pack
 
-To compress a Beego application into a single deployable file:
+To compress a Radiant application into a single deployable file:
 
 ```bash
-$ bee pack
+$ radical pack
 ______
 | ___ \
 | |_/ /  ___   ___
 | ___ \ / _ \ / _ \
 | |_/ /|  __/|  __/
 \____/  \___| \___| v1.6.2
-2016/12/26 22:29:29 INFO     ▶ 0001 Packaging application on '/home/beeuser/.go/src/github.com/user/my-web-app'...
+2016/12/26 22:29:29 INFO     ▶ 0001 Packaging application on '/home/radicaluser/.go/src/github.com/user/my-web-app'...
 2016/12/26 22:29:29 INFO     ▶ 0002 Building application...
 2016/12/26 22:29:29 INFO     ▶ 0003 Using: GOOS=linux GOARCH=amd64
 2016/12/26 22:29:31 SUCCESS  ▶ 0004 Build Successful!
-2016/12/26 22:29:31 INFO     ▶ 0005 Writing to output: /home/beeuser/.go/src/github.com/user/my-web-app/my-web-app.tar.gz
+2016/12/26 22:29:31 INFO     ▶ 0005 Writing to output: /home/radicaluser/.go/src/github.com/user/my-web-app/my-web-app.tar.gz
 2016/12/26 22:29:31 INFO     ▶ 0006 Excluding relpath prefix: .
 2016/12/26 22:29:31 INFO     ▶ 0007 Excluding relpath suffix: .go:.DS_Store:.tmp
 2016/12/26 22:29:32 SUCCESS  ▶ 0008 Application packed!
 ```
 
-For more information on the usage, run `bee help pack`.
+For more information on the usage, run `radical help pack`.
 
-### bee rs 
+### radical rs 
 Inspired by makefile / npm scripts.
-  Run script allows you to run arbitrary commands using Bee.
-  Custom commands are provided from the "scripts" object inside bee.json or Beefile.
+  Run script allows you to run arbitrary commands using Radical.
+  Custom commands are provided from the "scripts" object inside radical.json or Radicalfile.
 
-  To run a custom command, use: $ bee rs mycmd ARGS
+  To run a custom command, use: $ radical rs mycmd ARGS
 
 ```bash
-$ bee help rs
+$ radical help rs
 
 USAGE
-  bee rs
+  radical rs
 
 DESCRIPTION
-  Run script allows you to run arbitrary commands using Bee.
-  Custom commands are provided from the "scripts" object inside bee.json or Beefile.
+  Run script allows you to run arbitrary commands using Radical.
+  Custom commands are provided from the "scripts" object inside radical.json or Radicalfile.
 
-  To run a custom command, use: $ bee rs mycmd ARGS
+  To run a custom command, use: $ radical rs mycmd ARGS
   
 AVAILABLE SCRIPTS
   gtest
@@ -198,16 +198,16 @@ AVAILABLE SCRIPTS
 ```
 
 *Run your scripts with:*
-```$ bee rs gtest tests/*.go```
-```$ bee rs gtestall```
+```$ radical rs gtest tests/*.go```
+```$ radical rs gtestall```
 
 
-### bee api
+### radical api
 
-To create a Beego API application:
+To create a Radiant API application:
 
 ```bash
-$ bee api my-api
+$ radical api my-api
 ______
 | ___ \
 | |_/ /  ___   ___
@@ -215,31 +215,31 @@ ______
 | |_/ /|  __/|  __/
 \____/  \___| \___| v1.6.2
 2016/12/26 22:30:12 INFO     ▶ 0001 Creating API...
-    create   /home/beeuser/.go/src/github.com/user/my-api
-    create   /home/beeuser/.go/src/github.com/user/my-api/conf
-    create   /home/beeuser/.go/src/github.com/user/my-api/controllers
-    create   /home/beeuser/.go/src/github.com/user/my-api/tests
-    create   /home/beeuser/.go/src/github.com/user/my-api/conf/app.conf
-    create   /home/beeuser/.go/src/github.com/user/my-api/models
-    create   /home/beeuser/.go/src/github.com/user/my-api/routers/
-    create   /home/beeuser/.go/src/github.com/user/my-api/controllers/object.go
-    create   /home/beeuser/.go/src/github.com/user/my-api/controllers/user.go
-    create   /home/beeuser/.go/src/github.com/user/my-api/tests/default_test.go
-    create   /home/beeuser/.go/src/github.com/user/my-api/routers/router.go
-    create   /home/beeuser/.go/src/github.com/user/my-api/models/object.go
-    create   /home/beeuser/.go/src/github.com/user/my-api/models/user.go
-    create   /home/beeuser/.go/src/github.com/user/my-api/main.go
+    create   /home/radicaluser/.go/src/github.com/user/my-api
+    create   /home/radicaluser/.go/src/github.com/user/my-api/conf
+    create   /home/radicaluser/.go/src/github.com/user/my-api/controllers
+    create   /home/radicaluser/.go/src/github.com/user/my-api/tests
+    create   /home/radicaluser/.go/src/github.com/user/my-api/conf/app.conf
+    create   /home/radicaluser/.go/src/github.com/user/my-api/models
+    create   /home/radicaluser/.go/src/github.com/user/my-api/routers/
+    create   /home/radicaluser/.go/src/github.com/user/my-api/controllers/object.go
+    create   /home/radicaluser/.go/src/github.com/user/my-api/controllers/user.go
+    create   /home/radicaluser/.go/src/github.com/user/my-api/tests/default_test.go
+    create   /home/radicaluser/.go/src/github.com/user/my-api/routers/router.go
+    create   /home/radicaluser/.go/src/github.com/user/my-api/models/object.go
+    create   /home/radicaluser/.go/src/github.com/user/my-api/models/user.go
+    create   /home/radicaluser/.go/src/github.com/user/my-api/main.go
 2016/12/26 22:30:12 SUCCESS  ▶ 0002 New API successfully created!
 ```
 
-For more information on the usage, run `bee help api`.
+For more information on the usage, run `radical help api`.
 
-### bee hprose
+### radical hprose
 
-To create an Hprose RPC application based on Beego:
+To create an Hprose RPC application based on Radiant:
 
 ```bash
-$ bee hprose my-rpc-app
+$ radical hprose my-rpc-app
 ______
 | ___ \
 | |_/ /  ___   ___
@@ -247,60 +247,60 @@ ______
 | |_/ /|  __/|  __/
 \____/  \___| \___| v1.6.2
 2016/12/26 22:30:58 INFO     ▶ 0001 Creating application...
-    create   /home/beeuser/.go/src/github.com/user/my-rpc-app/
-    create   /home/beeuser/.go/src/github.com/user/my-rpc-app/conf/
-    create   /home/beeuser/.go/src/github.com/user/my-rpc-app/controllers/
-    create   /home/beeuser/.go/src/github.com/user/my-rpc-app/models/
-    create   /home/beeuser/.go/src/github.com/user/my-rpc-app/routers/
-    create   /home/beeuser/.go/src/github.com/user/my-rpc-app/tests/
-    create   /home/beeuser/.go/src/github.com/user/my-rpc-app/static/
-    create   /home/beeuser/.go/src/github.com/user/my-rpc-app/static/js/
-    create   /home/beeuser/.go/src/github.com/user/my-rpc-app/static/css/
-    create   /home/beeuser/.go/src/github.com/user/my-rpc-app/static/img/
-    create   /home/beeuser/.go/src/github.com/user/my-rpc-app/views/
-    create   /home/beeuser/.go/src/github.com/user/my-rpc-app/conf/app.conf
-    create   /home/beeuser/.go/src/github.com/user/my-rpc-app/controllers/default.go
-    create   /home/beeuser/.go/src/github.com/user/my-rpc-app/views/index.tpl
-    create   /home/beeuser/.go/src/github.com/user/my-rpc-app/routers/router.go
-    create   /home/beeuser/.go/src/github.com/user/my-rpc-app/tests/default_test.go
-    create   /home/beeuser/.go/src/github.com/user/my-rpc-app/main.go
+    create   /home/radicaluser/.go/src/github.com/user/my-rpc-app/
+    create   /home/radicaluser/.go/src/github.com/user/my-rpc-app/conf/
+    create   /home/radicaluser/.go/src/github.com/user/my-rpc-app/controllers/
+    create   /home/radicaluser/.go/src/github.com/user/my-rpc-app/models/
+    create   /home/radicaluser/.go/src/github.com/user/my-rpc-app/routers/
+    create   /home/radicaluser/.go/src/github.com/user/my-rpc-app/tests/
+    create   /home/radicaluser/.go/src/github.com/user/my-rpc-app/static/
+    create   /home/radicaluser/.go/src/github.com/user/my-rpc-app/static/js/
+    create   /home/radicaluser/.go/src/github.com/user/my-rpc-app/static/css/
+    create   /home/radicaluser/.go/src/github.com/user/my-rpc-app/static/img/
+    create   /home/radicaluser/.go/src/github.com/user/my-rpc-app/views/
+    create   /home/radicaluser/.go/src/github.com/user/my-rpc-app/conf/app.conf
+    create   /home/radicaluser/.go/src/github.com/user/my-rpc-app/controllers/default.go
+    create   /home/radicaluser/.go/src/github.com/user/my-rpc-app/views/index.tpl
+    create   /home/radicaluser/.go/src/github.com/user/my-rpc-app/routers/router.go
+    create   /home/radicaluser/.go/src/github.com/user/my-rpc-app/tests/default_test.go
+    create   /home/radicaluser/.go/src/github.com/user/my-rpc-app/main.go
 2016/12/26 22:30:58 SUCCESS  ▶ 0002 New application successfully created!
 ```
 
-For more information on the usage, run `bee help hprose`.
+For more information on the usage, run `radical help hprose`.
 
-### bee bale
+### radical bale
 
 To pack all the static files into Go source files:
 
 ```bash
-$ bee bale
+$ radical bale
 ______
 | ___ \
 | |_/ /  ___   ___
 | ___ \ / _ \ / _ \
 | |_/ /|  __/|  __/
 \____/  \___| \___| v1.6.2
-2016/12/26 22:32:41 INFO     ▶ 0001 Loading configuration from 'bee.json'...
+2016/12/26 22:32:41 INFO     ▶ 0001 Loading configuration from 'radical.json'...
 2016/12/26 22:32:41 SUCCESS  ▶ 0002 Baled resources successfully!
 ```
 
-For more information on the usage, run `bee help bale`.
+For more information on the usage, run `radical help bale`.
 
-### bee migrate
+### radical migrate
 
-For database migrations, use `bee migrate`.
+For database migrations, use `radical migrate`.
 
-For more information on the usage, run `bee help migrate`.
+For more information on the usage, run `radical help migrate`.
 
-### bee generate
+### radical generate
 
-Bee also comes with a source code generator which speeds up the development.
+Radical also comes with a source code generator which speeds up the development.
 
 For example, to generate a new controller named `hello`:
 
 ```bash
-$ bee generate controller hello
+$ radical generate controller hello
 ______
 | ___ \
 | |_/ /  ___   ___
@@ -309,20 +309,20 @@ ______
 \____/  \___| \___| v1.6.2
 2016/12/26 22:33:58 INFO     ▶ 0001 Using 'Hello' as controller name
 2016/12/26 22:33:58 INFO     ▶ 0002 Using 'controllers' as package name
-    create   /home/beeuser/.go/src/github.com/user/my-web-app/controllers/hello.go
+    create   /home/radicaluser/.go/src/github.com/user/my-web-app/controllers/hello.go
 2016/12/26 22:33:58 SUCCESS  ▶ 0003 Controller successfully generated!
 ```
 
-For more information on the usage, run `bee help generate`.
+For more information on the usage, run `radical help generate`.
 
-### bee dockerize
+### radical dockerize
 
-Bee also helps you dockerize your Beego application by generating a Dockerfile.
+Radical also helps you dockerize your Radiant application by generating a Dockerfile.
 
 For example, to generate a Dockerfile with `Go version 1.6.4` and exposing port `9000`:
 
 ```bash
-$ bee dockerize -image="library/golang:1.6.4" -expose=9000
+$ radical dockerize -image="library/golang:1.6.4" -expose=9000
 ______
 | ___ \
 | |_/ /  ___   ___
@@ -333,11 +333,11 @@ ______
 2016/12/26 22:34:54 SUCCESS  ▶ 0002 Dockerfile generated.
 ```
 
-For more information on the usage, run `bee help dockerize`.
+For more information on the usage, run `radical help dockerize`.
 
-### bee dlv
+### radical dlv
 
-Bee can also help with debugging your application. To start a debugging session:
+Radical can also help with debugging your application. To start a debugging session:
 
 ```bash
 ______
@@ -355,16 +355,16 @@ Breakpoint 1 set at 0x40100f for main.main() ./main.go:8
 > main.main() ./main.go:8 (hits goroutine(1):1 total:1) (PC: 0x40100f)
      3:	import (
      4:		_ "github.com/user/myapp/routers"
-     5:		beego "github.com/beego/beego/v2/server/web"
+     5:		radiant "github.com/W3-Engineers-Ltd/Radiant/server/web"
      6:	)
      7:	
 =>   8:	func main() {
-     9:		beego.Run()
+     9:		radiant.Run()
     10:	}
     11:
 ```
 
-For more information on the usage, run `bee help dlv`.
+For more information on the usage, run `radical help dlv`.
 
 ## Shortcuts
 
@@ -372,25 +372,25 @@ Because you'll likely type these generator commands over and over, it makes sens
 
 ```bash
 # Generator Stuff
-alias g:a="bee generate appcode"
-alias g:m="bee generate model"
-alias g:c="bee generate controller"
-alias g:v="bee generate view"
-alias g:mi="bee generate migration"
+alias g:a="radical generate appcode"
+alias g:m="radical generate model"
+alias g:c="radical generate controller"
+alias g:v="radical generate view"
+alias g:mi="radical generate migration"
 ```
 
 These can be stored , for example, in your `~/.bash_profile` or `~/.bashrc` files.
 
 ## Help
 
-To print more information on the usage of a particular command, use `bee help <command>`.
+To print more information on the usage of a particular command, use `radical help <command>`.
 
 For instance, to get more information about the `run` command:
 
 ```bash
-$ bee help run
+$ radical help run
 USAGE
-  bee run [appname] [watchall] [-main=*.go] [-downdoc=true]  [-gendoc=true] [-vendor=true] [-e=folderToExclude]  [-tags=goBuildTags] [-runmode=BEEGO_RUNMODE]
+  radical run [appname] [watchall] [-main=*.go] [-downdoc=true]  [-gendoc=true] [-vendor=true] [-e=folderToExclude]  [-tags=goBuildTags] [-runmode=BEEGO_RUNMODE]
 
 OPTIONS
   -downdoc
@@ -406,7 +406,7 @@ OPTIONS
       Specify main go files.
 
   -runmode
-      Set the Beego run mode.
+      Set the Radiant run mode.
 
   -tags
       Set the build tags. See: https://golang.org/pkg/go/build/
@@ -453,7 +453,7 @@ If you are submitting an issue for a bug, please include the following:
 
 - An overview of the issue
 - Your use case (why is this a bug for you?)
-- The version of `bee` you are running (include the output of `bee version`)
+- The version of `radical` you are running (include the output of `radical version`)
 - Steps to reproduce the issue
 - Eventually, logs from your application.
 - Ideally, a suggested fix
@@ -482,7 +482,7 @@ go to greater lengths in your message's body. A good example can be found in [An
 
 - Make sure all tests pass before submitting your changes.
 
-- Rebase your commits. It may be that new commits have been introduced on `develop`.
+- Rebase your commits. It may be that new commits have radicaln introduced on `develop`.
 Rebasing will update your branch with the most recent code and make your changes easier to review:
 
   ```
@@ -520,7 +520,7 @@ Rebasing will update your branch with the most recent code and make your changes
 ## Licence
 
 ```text
-Copyright 2016 bee authors
+Copyright 2016 radical authors
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.

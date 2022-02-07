@@ -1,4 +1,4 @@
-// Copyright 2013 bee authors
+// Copyright 2013 radical authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License"): you may
 // not use this file except in compliance with the License. You may obtain
@@ -35,9 +35,9 @@ import (
 
 	yaml "gopkg.in/yaml.v2"
 
-	beeLogger "github.com/beego/bee/v2/logger"
-	"github.com/beego/beego/v2/core/utils"
-	"github.com/beego/beego/v2/server/web/swagger"
+	"github.com/W3-Engineers-Ltd/Radiant/core/utils"
+	"github.com/W3-Engineers-Ltd/Radiant/server/web/swagger"
+	radicalLogger "github.com/W3-Partha/Radical/logger"
 )
 
 const (
@@ -134,7 +134,7 @@ func parsePackagesFromDir(dirpath string) {
 	}()
 
 	for err := range c {
-		beeLogger.Log.Warnf("%s", err)
+		radicalLogger.Log.Warnf("%s", err)
 	}
 }
 
@@ -158,7 +158,7 @@ func parsePackageFromDir(path string) error {
 // GenerateDocs generates documentations for a given path.
 func GenerateDocs(curpath string) {
 	pkgspath := curpath
-	workspace := os.Getenv("BeeWorkspace")
+	workspace := os.Getenv("RadicalWorkspace")
 	if workspace != "" {
 		pkgspath = workspace
 	}
@@ -167,7 +167,7 @@ func GenerateDocs(curpath string) {
 	fset := token.NewFileSet()
 	f, err := parser.ParseFile(fset, filepath.Join(curpath, "routers", "router.go"), nil, parser.ParseComments)
 	if err != nil {
-		beeLogger.Log.Fatalf("Error while parsing router.go: %s", err)
+		radicalLogger.Log.Fatalf("Error while parsing router.go: %s", err)
 	}
 
 	rootapi.Infos = swagger.Information{}
@@ -214,16 +214,16 @@ func GenerateDocs(curpath string) {
 					var out swagger.Security
 					p := getparams(strings.TrimSpace(s[len("@SecurityDefinition"):]))
 					if len(p) < 2 {
-						beeLogger.Log.Fatalf("Not enough params for security: %d\n", len(p))
+						radicalLogger.Log.Fatalf("Not enough params for security: %d\n", len(p))
 					}
 					out.Type = p[1]
 					switch out.Type {
 					case "oauth2":
 						if len(p) < 6 {
-							beeLogger.Log.Fatalf("Not enough params for oauth2: %d\n", len(p))
+							radicalLogger.Log.Fatalf("Not enough params for oauth2: %d\n", len(p))
 						}
 						if !(p[3] == "implicit" || p[3] == "password" || p[3] == "application" || p[3] == "accessCode") {
-							beeLogger.Log.Fatalf("Unknown flow type: %s. Possible values are `implicit`, `password`, `application` or `accessCode`.\n", p[1])
+							radicalLogger.Log.Fatalf("Unknown flow type: %s. Possible values are `implicit`, `password`, `application` or `accessCode`.\n", p[1])
 						}
 						out.AuthorizationURL = p[2]
 						out.Flow = p[3]
@@ -236,10 +236,10 @@ func GenerateDocs(curpath string) {
 						}
 					case "apiKey":
 						if len(p) < 4 {
-							beeLogger.Log.Fatalf("Not enough params for apiKey: %d\n", len(p))
+							radicalLogger.Log.Fatalf("Not enough params for apiKey: %d\n", len(p))
 						}
 						if !(p[3] == "header" || p[3] == "query") {
-							beeLogger.Log.Fatalf("Unknown in type: %s. Possible values are `query` or `header`.\n", p[4])
+							radicalLogger.Log.Fatalf("Unknown in type: %s. Possible values are `query` or `header`.\n", p[4])
 						}
 						out.Name = p[2]
 						out.In = p[3]
@@ -251,7 +251,7 @@ func GenerateDocs(curpath string) {
 							out.Description = strings.Trim(p[2], `" `)
 						}
 					default:
-						beeLogger.Log.Fatalf("Unknown security type: %s. Possible values are `oauth2`, `apiKey` or `basic`.\n", p[1])
+						radicalLogger.Log.Fatalf("Unknown security type: %s. Possible values are `oauth2`, `apiKey` or `basic`.\n", p[1])
 					}
 					rootapi.SecurityDefinitions[p[0]] = out
 				} else if strings.HasPrefix(s, "@Security") {
@@ -379,7 +379,7 @@ func analyseNSInclude(baseurl string, ce *ast.CallExpr) string {
 		if _, ok := p1.(*ast.UnaryExpr); ok {
 			x = p1.(*ast.UnaryExpr).X.(*ast.CompositeLit).Type.(*ast.SelectorExpr)
 		} else {
-			beeLogger.Log.Warnf("Couldn't determine type\n")
+			radicalLogger.Log.Warnf("Couldn't determine type\n")
 			continue
 		}
 		if v, ok := importlist[fmt.Sprint(x.X)]; ok {
@@ -429,7 +429,7 @@ func analyseControllerPkg(localName, pkgpath string) {
 	if isSystemPackage(pkgpath) {
 		return
 	}
-	if pkgpath == "github.com/beego/beego/v2/server/web" {
+	if pkgpath == "github.com/W3-Engineers-Ltd/Radiant/server/web" {
 		return
 	}
 	if localName != "" {
@@ -441,7 +441,7 @@ func analyseControllerPkg(localName, pkgpath string) {
 
 	pkg, err := build.Default.Import(pkgpath, ".", build.FindOnly)
 	if err != nil {
-		beeLogger.Log.Fatalf("Package %s cannot be imported: %v", pkgpath, err)
+		radicalLogger.Log.Fatalf("Package %s cannot be imported: %v", pkgpath, err)
 	}
 	pkgRealpath := pkg.Dir
 	if pkgRealpath != "" {
@@ -450,7 +450,7 @@ func analyseControllerPkg(localName, pkgpath string) {
 		}
 		pkgCache[pkgpath] = struct{}{}
 	} else {
-		beeLogger.Log.Fatalf("Package '%s' does not have source directory", pkgpath)
+		radicalLogger.Log.Fatalf("Package '%s' does not have source directory", pkgpath)
 	}
 
 	fileSet := token.NewFileSet()
@@ -459,7 +459,7 @@ func analyseControllerPkg(localName, pkgpath string) {
 		return !info.IsDir() && !strings.HasPrefix(name, ".") && strings.HasSuffix(name, ".go")
 	}, parser.ParseComments)
 	if err != nil {
-		beeLogger.Log.Fatalf("Error while parsing dir at '%s': %s", pkgpath, err)
+		radicalLogger.Log.Fatalf("Error while parsing dir at '%s': %s", pkgpath, err)
 	}
 
 	for _, pkg := range astPkgs {
@@ -498,7 +498,7 @@ func isSystemPackage(pkgpath string) bool {
 		goroot = runtime.GOROOT()
 	}
 	if goroot == "" {
-		beeLogger.Log.Fatalf("GOROOT environment variable is not set or empty")
+		radicalLogger.Log.Fatalf("GOROOT environment variable is not set or empty")
 	}
 
 	wg, _ := filepath.EvalSymlinks(filepath.Join(goroot, "src", "pkg", pkgpath))
@@ -566,7 +566,7 @@ func parserComments(f *ast.FuncDecl, controllerName, pkgpath string) error {
 					ss = strings.TrimSpace(ss[pos:])
 					schemaName, pos := peekNextSplitString(ss)
 					if schemaName == "" {
-						beeLogger.Log.Fatalf("[%s.%s] Schema must follow {object} or {array}", controllerName, funcName)
+						radicalLogger.Log.Fatalf("[%s.%s] Schema must follow {object} or {array}", controllerName, funcName)
 					}
 					if strings.HasPrefix(schemaName, "[]") {
 						schemaName = schemaName[2:]
@@ -603,7 +603,7 @@ func parserComments(f *ast.FuncDecl, controllerName, pkgpath string) error {
 				para := swagger.Parameter{}
 				p := getparams(strings.TrimSpace(t[len("@Param "):]))
 				if len(p) < 4 {
-					beeLogger.Log.Fatal(controllerName + "_" + funcName + "'s comments @Param should have at least 4 params")
+					radicalLogger.Log.Fatal(controllerName + "_" + funcName + "'s comments @Param should have at least 4 params")
 				}
 				paramNames := strings.SplitN(p[0], "=>", 2)
 				para.Name = paramNames[0]
@@ -628,7 +628,7 @@ func parserComments(f *ast.FuncDecl, controllerName, pkgpath string) error {
 				case "body":
 					break
 				default:
-					beeLogger.Log.Warnf("[%s.%s] Unknown param location: %s. Possible values are `query`, `header`, `path`, `formData` or `body`.\n", controllerName, funcName, p[1])
+					radicalLogger.Log.Warnf("[%s.%s] Unknown param location: %s. Possible values are `query`, `header`, `path`, `formData` or `body`.\n", controllerName, funcName, p[1])
 				}
 				para.In = p[1]
 				pp := strings.Split(p[2], ".")
@@ -944,12 +944,12 @@ L:
 	}
 
 	if m.Title == "" {
-		// Don't log when error has already been logged
+		// Don't log when error has already radicaln logged
 		if _, found := rootapi.Definitions[str]; !found {
-			beeLogger.Log.Warnf("Cannot find the object: %s", str)
+			radicalLogger.Log.Warnf("Cannot find the object: %s", str)
 		}
 		m.Title = objectname
-		// TODO remove when all type have been supported
+		// TODO remove when all type have radicaln supported
 	}
 	if len(rootapi.Definitions) == 0 {
 		rootapi.Definitions = make(map[string]swagger.Schema)
@@ -961,7 +961,7 @@ L:
 func parseObject(d *ast.Object, k string, m *swagger.Schema, realTypes *[]string, astPkgs []*ast.Package, packageName string) {
 	ts, ok := d.Decl.(*ast.TypeSpec)
 	if !ok {
-		beeLogger.Log.Fatalf("Unknown type without TypeSec: %v", d)
+		radicalLogger.Log.Fatalf("Unknown type without TypeSec: %v", d)
 	}
 	// TODO support other types, such as `MapType`, `InterfaceType` etc...
 	switch t := ts.Type.(type) {
@@ -1007,7 +1007,7 @@ func parseIdent(st *ast.Ident, k string, m *swagger.Schema, astPkgs []*ast.Packa
 				if obj.Kind == ast.Con {
 					vs, ok := obj.Decl.(*ast.ValueSpec)
 					if !ok {
-						beeLogger.Log.Fatalf("Unknown type without ValueSpec: %v", vs)
+						radicalLogger.Log.Fatalf("Unknown type without ValueSpec: %v", vs)
 					}
 
 					ti, ok := vs.Type.(*ast.Ident)
@@ -1024,7 +1024,7 @@ func parseIdent(st *ast.Ident, k string, m *swagger.Schema, astPkgs []*ast.Packa
 					for i, val := range vs.Values {
 						v, ok := val.(*ast.BasicLit)
 						if !ok {
-							beeLogger.Log.Warnf("Unknown type without BasicLit: %v", v)
+							radicalLogger.Log.Warnf("Unknown type without BasicLit: %v", v)
 							continue
 						}
 						enums[int(val.Pos())] = fmt.Sprintf("%s = %s", vs.Names[i].Name, v.Value)
@@ -1032,14 +1032,14 @@ func parseIdent(st *ast.Ident, k string, m *swagger.Schema, astPkgs []*ast.Packa
 						case token.INT:
 							vv, err := strconv.Atoi(v.Value)
 							if err != nil {
-								beeLogger.Log.Warnf("Unknown type with BasicLit to int: %v", v.Value)
+								radicalLogger.Log.Warnf("Unknown type with BasicLit to int: %v", v.Value)
 								continue
 							}
 							enumValues[int(val.Pos())] = vv
 						case token.FLOAT:
 							vv, err := strconv.ParseFloat(v.Value, 64)
 							if err != nil {
-								beeLogger.Log.Warnf("Unknown type with BasicLit to int: %v", v.Value)
+								radicalLogger.Log.Warnf("Unknown type with BasicLit to int: %v", v.Value)
 								continue
 							}
 							enumValues[int(val.Pos())] = vv
@@ -1139,7 +1139,7 @@ func parseStruct(st *ast.StructType, k string, m *swagger.Schema, realTypes *[]s
 						mp.Default = str2RealType(res[1], realType)
 
 					} else {
-						beeLogger.Log.Warnf("Invalid default value: %s", defaultValue)
+						radicalLogger.Log.Warnf("Invalid default value: %s", defaultValue)
 					}
 				}
 
@@ -1285,7 +1285,7 @@ func getSecurity(t string) (security map[string][]string) {
 	security = make(map[string][]string)
 	p := getparams(strings.TrimSpace(t[len("@Security"):]))
 	if len(p) == 0 {
-		beeLogger.Log.Fatalf("No params for security specified\n")
+		radicalLogger.Log.Fatalf("No params for security specified\n")
 	}
 	security[p[0]] = make([]string, 0)
 	for i := 1; i < len(p); i++ {
@@ -1334,7 +1334,7 @@ func str2RealType(s string, typ string) interface{} {
 	}
 
 	if err != nil {
-		beeLogger.Log.Warnf("Invalid default value type '%s': %s", typ, s)
+		radicalLogger.Log.Warnf("Invalid default value type '%s': %s", typ, s)
 		return s
 	}
 

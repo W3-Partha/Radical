@@ -1,4 +1,4 @@
-// Copyright 2013 bee authors
+// Copyright 2013 radical authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License"): you may
 // not use this file except in compliance with the License. You may obtain
@@ -24,11 +24,11 @@ import (
 	"runtime"
 	"strings"
 
-	"github.com/beego/bee/v2/cmd/commands"
-	"github.com/beego/bee/v2/cmd/commands/version"
-	"github.com/beego/bee/v2/config"
-	beeLogger "github.com/beego/bee/v2/logger"
-	"github.com/beego/bee/v2/utils"
+	"github.com/W3-Partha/Radical/cmd/commands"
+	"github.com/W3-Partha/Radical/cmd/commands/version"
+	"github.com/W3-Partha/Radical/config"
+	radicalLogger "github.com/W3-Partha/Radical/logger"
+	"github.com/W3-Partha/Radical/utils"
 )
 
 var CmdBale = &commands.Command{
@@ -57,10 +57,10 @@ func runBale(cmd *commands.Command, args []string) int {
 	// Pack and compress data
 	for _, p := range config.Conf.Bale.Dirs {
 		if !utils.IsExist(p) {
-			beeLogger.Log.Warnf("Skipped directory: %s", p)
+			radicalLogger.Log.Warnf("Skipped directory: %s", p)
 			continue
 		}
-		beeLogger.Log.Infof("Packaging directory: %s", p)
+		radicalLogger.Log.Infof("Packaging directory: %s", p)
 		filepath.Walk(p, walkFn)
 	}
 
@@ -72,16 +72,16 @@ func runBale(cmd *commands.Command, args []string) int {
 
 	fw, err := os.Create("bale.go")
 	if err != nil {
-		beeLogger.Log.Fatalf("Failed to create file: %s", err)
+		radicalLogger.Log.Fatalf("Failed to create file: %s", err)
 	}
 	defer fw.Close()
 
 	_, err = fw.Write(buf.Bytes())
 	if err != nil {
-		beeLogger.Log.Fatalf("Failed to write data: %s", err)
+		radicalLogger.Log.Fatalf("Failed to write data: %s", err)
 	}
 
-	beeLogger.Log.Success("Baled resources successfully!")
+	radicalLogger.Log.Success("Baled resources successfully!")
 	return 0
 }
 
@@ -150,7 +150,7 @@ func walkFn(resPath string, info os.FileInfo, _ error) error {
 	// Open resource files
 	fr, err := os.Open(resPath)
 	if err != nil {
-		beeLogger.Log.Fatalf("Failed to read file: %s", err)
+		radicalLogger.Log.Fatalf("Failed to read file: %s", err)
 	}
 
 	// Convert path
@@ -168,7 +168,7 @@ func walkFn(resPath string, info os.FileInfo, _ error) error {
 	os.MkdirAll(path.Dir(resPath), os.ModePerm)
 	fw, err := os.Create("bale/" + resPath + ".go")
 	if err != nil {
-		beeLogger.Log.Fatalf("Failed to create file: %s", err)
+		radicalLogger.Log.Fatalf("Failed to create file: %s", err)
 	}
 	defer fw.Close()
 

@@ -8,7 +8,7 @@
 \**********************************************************/
 /**********************************************************\
  *                                                        *
- * Build rpc application use Hprose base on beego         *
+ * Build rpc application use Hprose base on radiant         *
  *                                                        *
  * LastModified: Oct 23, 2014                             *
  * Author: Liu jian <laoliu@lanmv.com>                    *
@@ -24,9 +24,9 @@ import (
 	"path"
 	"strings"
 
-	beeLogger "github.com/beego/bee/v2/logger"
-	"github.com/beego/bee/v2/logger/colors"
-	"github.com/beego/bee/v2/utils"
+	radicalLogger "github.com/W3-Partha/Radical/logger"
+	"github.com/W3-Partha/Radical/logger/colors"
+	"github.com/W3-Partha/Radical/utils"
 	_ "github.com/go-sql-driver/mysql"
 	_ "github.com/lib/pq"
 )
@@ -47,7 +47,7 @@ import (
 	"{{.Appname}}/models"
 	"github.com/hprose/hprose-golang/rpc"
 
-	beego "github.com/beego/beego/v2/server/web"
+	radiant "github.com/W3-Engineers-Ltd/Radiant/server/web"
 )
 
 func logInvokeHandler(
@@ -76,8 +76,8 @@ func main() {
 	service.AddFunction("GetOne", models.GetOne)
 
 	// Start Service
-	beego.Handler("/", service)
-	beego.Run()
+	radiant.Handler("/", service)
+	radiant.Run()
 }
 `
 
@@ -90,8 +90,8 @@ import (
 	"{{.Appname}}/models"
 	"github.com/hprose/hprose-golang/rpc"
 
-	beego "github.com/beego/beego/v2/server/web"
-	"github.com/beego/beego/v2/client/orm"
+	radiant "github.com/W3-Engineers-Ltd/Radiant/server/web"
+	"github.com/W3-Engineers-Ltd/Radiant/client/orm"
 	{{.DriverPkg}}
 )
 
@@ -123,8 +123,8 @@ func main() {
 	{{HproseFunctionList}}
 
 	// Start Service
-	beego.Handler("/", service)
-	beego.Run()
+	radiant.Handler("/", service)
+	radiant.Run()
 }
 
 `
@@ -283,7 +283,7 @@ func GenerateHproseAppcode(driver, connStr, level, tables, currpath string) {
 	case "3":
 		mode = OModel | OController | ORouter
 	default:
-		beeLogger.Log.Fatal("Invalid 'level' option. Level must be either \"1\", \"2\" or \"3\"")
+		radicalLogger.Log.Fatal("Invalid 'level' option. Level must be either \"1\", \"2\" or \"3\"")
 	}
 	var selectedTables map[string]bool
 	if tables != "" {
@@ -296,9 +296,9 @@ func GenerateHproseAppcode(driver, connStr, level, tables, currpath string) {
 	case "mysql":
 	case "postgres":
 	case "sqlite":
-		beeLogger.Log.Fatal("Generating app code from SQLite database is not supported yet")
+		radicalLogger.Log.Fatal("Generating app code from SQLite database is not supported yet")
 	default:
-		beeLogger.Log.Fatalf("Unknown database driver '%s'. Driver must be one of mysql, postgres or sqlite", driver)
+		radicalLogger.Log.Fatalf("Unknown database driver '%s'. Driver must be one of mysql, postgres or sqlite", driver)
 	}
 	genHprose(driver, connStr, mode, selectedTables, currpath)
 }
@@ -308,11 +308,11 @@ func GenerateHproseAppcode(driver, connStr, level, tables, currpath string) {
 func genHprose(dbms, connStr string, mode byte, selectedTableNames map[string]bool, currpath string) {
 	db, err := sql.Open(dbms, connStr)
 	if err != nil {
-		beeLogger.Log.Fatalf("Could not connect to '%s' database using '%s': %s", dbms, connStr, err)
+		radicalLogger.Log.Fatalf("Could not connect to '%s' database using '%s': %s", dbms, connStr, err)
 	}
 	defer db.Close()
 	if trans, ok := dbDriver[dbms]; ok {
-		beeLogger.Log.Info("Analyzing database tables...")
+		radicalLogger.Log.Info("Analyzing database tables...")
 		tableNames := trans.GetTableNames(db)
 		tables := getTableObjects(tableNames, db, trans)
 		mvcPath := new(MvcPath)
@@ -321,7 +321,7 @@ func genHprose(dbms, connStr string, mode byte, selectedTableNames map[string]bo
 		pkgPath := getPackagePath(currpath)
 		writeHproseSourceFiles(pkgPath, tables, mode, mvcPath, selectedTableNames)
 	} else {
-		beeLogger.Log.Fatalf("Generating app code from '%s' database is not supported yet", dbms)
+		radicalLogger.Log.Fatalf("Generating app code from '%s' database is not supported yet", dbms)
 	}
 }
 
@@ -330,7 +330,7 @@ func genHprose(dbms, connStr string, mode byte, selectedTableNames map[string]bo
 // Newly geneated files will be inside these folders.
 func writeHproseSourceFiles(pkgPath string, tables []*Table, mode byte, paths *MvcPath, selectedTables map[string]bool) {
 	if (OModel & mode) == OModel {
-		beeLogger.Log.Info("Creating model files...")
+		radicalLogger.Log.Info("Creating model files...")
 		writeHproseModelFiles(tables, paths.ModelPath, selectedTables)
 	}
 }
@@ -351,21 +351,21 @@ func writeHproseModelFiles(tables []*Table, mPath string, selectedTables map[str
 		var f *os.File
 		var err error
 		if utils.IsExist(fpath) {
-			beeLogger.Log.Warnf("'%s' already exists. Do you want to overwrite it? [Yes|No] ", fpath)
+			radicalLogger.Log.Warnf("'%s' already exists. Do you want to overwrite it? [Yes|No] ", fpath)
 			if utils.AskForConfirmation() {
 				f, err = os.OpenFile(fpath, os.O_RDWR|os.O_TRUNC, 0666)
 				if err != nil {
-					beeLogger.Log.Warnf("%s", err)
+					radicalLogger.Log.Warnf("%s", err)
 					continue
 				}
 			} else {
-				beeLogger.Log.Warnf("Skipped create file '%s'", fpath)
+				radicalLogger.Log.Warnf("Skipped create file '%s'", fpath)
 				continue
 			}
 		} else {
 			f, err = os.OpenFile(fpath, os.O_CREATE|os.O_RDWR, 0666)
 			if err != nil {
-				beeLogger.Log.Warnf("%s", err)
+				radicalLogger.Log.Warnf("%s", err)
 				continue
 			}
 		}
@@ -388,7 +388,7 @@ func writeHproseModelFiles(tables []*Table, mPath string, selectedTables map[str
 		fileStr = strings.Replace(fileStr, "{{timePkg}}", timePkg, -1)
 		fileStr = strings.Replace(fileStr, "{{importTimePkg}}", importTimePkg, -1)
 		if _, err := f.WriteString(fileStr); err != nil {
-			beeLogger.Log.Fatalf("Could not write model file to '%s'", fpath)
+			radicalLogger.Log.Fatalf("Could not write model file to '%s'", fpath)
 		}
 		utils.CloseFile(f)
 		fmt.Fprintf(w, "\t%s%screate%s\t %s%s\n", "\x1b[32m", "\x1b[1m", "\x1b[21m", fpath, "\x1b[0m")
@@ -419,7 +419,7 @@ import (
 	"reflect"
 	"strings"
 	{{timePkg}}
-	"github.com/beego/beego/v2/client/orm"
+	"github.com/W3-Engineers-Ltd/Radiant/client/orm"
 )
 
 {{modelStruct}}

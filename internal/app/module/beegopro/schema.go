@@ -1,4 +1,4 @@
-package beegopro
+package radiantpro
 
 import (
 	"fmt"
@@ -6,23 +6,23 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/beego/bee/v2/internal/pkg/command"
-	"github.com/beego/bee/v2/internal/pkg/system"
-	beeLogger "github.com/beego/bee/v2/logger"
-	"github.com/beego/bee/v2/utils"
+	"github.com/W3-Partha/Radical/internal/pkg/command"
+	"github.com/W3-Partha/Radical/internal/pkg/system"
+	radicalLogger "github.com/W3-Partha/Radical/logger"
+	"github.com/W3-Partha/Radical/utils"
 	"github.com/flosch/pongo2"
 	"github.com/smartwalle/pongo2render"
 )
 
 // store all data
 type Container struct {
-	BeegoProFile     string                 // beego pro toml
+	RadiantProFile   string                 // radiant pro toml
 	TimestampFile    string                 // store ts file
 	GoModFile        string                 // go mod file
 	UserOption       UserOption             // user option
 	TmplOption       TmplOption             // tmpl option
 	CurPath          string                 // user current path
-	EnableModules    map[string]interface{} // beego pro provider a collection of module
+	EnableModules    map[string]interface{} // radiant pro provider a collection of module
 	FunctionOnce     map[string]sync.Once   // exec function once
 	Timestamp        Timestamp
 	GenerateTime     string
@@ -80,11 +80,11 @@ func (descriptor Descriptor) Parse(modelName string, paths map[string]string) (n
 	for key, value := range paths {
 		absFile, err = filepath.Abs(value)
 		if err != nil {
-			beeLogger.Log.Fatalf("absolute path error %s from key %s and value %s", err, key, value)
+			radicalLogger.Log.Fatalf("absolute path error %s from key %s and value %s", err, key, value)
 		}
 		relPath, err = filepath.Rel(system.CurrentDir, absFile)
 		if err != nil {
-			beeLogger.Log.Fatalf("Could not get the relative path: %s", err)
+			radicalLogger.Log.Fatalf("Could not get the relative path: %s", err)
 		}
 		// user input path
 		ctx["path"+utils.CamelCase(key)] = value
@@ -94,18 +94,18 @@ func (descriptor Descriptor) Parse(modelName string, paths map[string]string) (n
 	ctx["modelName"] = lowerFirst(utils.CamelString(modelName))
 	relativeDstPath, err = render.TemplateFromString(descriptor.DstPath).Execute(ctx)
 	if err != nil {
-		beeLogger.Log.Fatalf("beego tmpl exec error, err: %s", err)
+		radicalLogger.Log.Fatalf("radiant tmpl exec error, err: %s", err)
 		return
 	}
 
 	newDescriptor.DstPath, err = filepath.Abs(relativeDstPath)
 	if err != nil {
-		beeLogger.Log.Fatalf("absolute path error %s from flush file %s", err, relativeDstPath)
+		radicalLogger.Log.Fatalf("absolute path error %s from flush file %s", err, relativeDstPath)
 	}
 
 	newDescriptor.Script, err = render.TemplateFromString(descriptor.Script).Execute(ctx)
 	if err != nil {
-		beeLogger.Log.Fatalf("parse script %s, error %s", descriptor.Script, err)
+		radicalLogger.Log.Fatalf("parse script %s, error %s", descriptor.Script, err)
 	}
 	return
 }
@@ -125,7 +125,7 @@ func (d Descriptor) ExecScript(path string) (err error) {
 		return concatenateError(err, stderr)
 	}
 
-	beeLogger.Log.Info(stdout)
+	radicalLogger.Log.Info(stdout)
 	return nil
 }
 

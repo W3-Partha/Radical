@@ -16,11 +16,11 @@ import (
 
 	"gopkg.in/yaml.v2"
 
-	"github.com/beego/bee/v2/cmd/commands"
-	"github.com/beego/bee/v2/config"
-	beeLogger "github.com/beego/bee/v2/logger"
-	"github.com/beego/bee/v2/logger/colors"
-	"github.com/beego/bee/v2/utils"
+	"github.com/W3-Partha/Radical/cmd/commands"
+	"github.com/W3-Partha/Radical/config"
+	radicalLogger "github.com/W3-Partha/Radical/logger"
+	"github.com/W3-Partha/Radical/logger/colors"
+	"github.com/W3-Partha/Radical/utils"
 )
 
 const verboseVersionBanner string = `%s%s______
@@ -28,9 +28,9 @@ const verboseVersionBanner string = `%s%s______
 | |_/ /  ___   ___
 | ___ \ / _ \ / _ \
 | |_/ /|  __/|  __/
-\____/  \___| \___| v{{ .BeeVersion }}%s
+\____/  \___| \___| v{{ .RadicalVersion }}%s
 %s%s
-├── Beego     : {{ .BeegoVersion }}
+├── Radiant     : {{ .RadiantVersion }}
 ├── GoVersion : {{ .GoVersion }}
 ├── GOOS      : {{ .GOOS }}
 ├── GOARCH    : {{ .GOARCH }}
@@ -46,14 +46,14 @@ const shortVersionBanner = `______
 | |_/ /  ___   ___
 | ___ \ / _ \ / _ \
 | |_/ /|  __/|  __/
-\____/  \___| \___| v{{ .BeeVersion }}
+\____/  \___| \___| v{{ .RadicalVersion }}
 `
 
 var CmdVersion = &commands.Command{
 	UsageLine: "version",
-	Short:     "Prints the current Bee version",
+	Short:     "Prints the current Radical version",
 	Long: `
-Prints the current Bee, Beego and Go version alongside the platform information.
+Prints the current Radical, Radiant and Go version alongside the platform information.
 `,
 	Run: versionCmd,
 }
@@ -83,14 +83,14 @@ func versionCmd(cmd *commands.Command, args []string) int {
 			runtime.GOROOT(),
 			runtime.Compiler,
 			version,
-			GetBeegoVersion(),
+			GetRadiantVersion(),
 		}
 		switch outputFormat {
 		case "json":
 			{
 				b, err := json.MarshalIndent(runtimeInfo, "", "    ")
 				if err != nil {
-					beeLogger.Log.Error(err.Error())
+					radicalLogger.Log.Error(err.Error())
 				}
 				fmt.Println(string(b))
 				return 0
@@ -99,7 +99,7 @@ func versionCmd(cmd *commands.Command, args []string) int {
 			{
 				b, err := yaml.Marshal(&runtimeInfo)
 				if err != nil {
-					beeLogger.Log.Error(err.Error())
+					radicalLogger.Log.Error(err.Error())
 				}
 				fmt.Println(string(b))
 				return 0
@@ -119,29 +119,29 @@ func ShowShortVersionBanner() {
 	InitBanner(output, bytes.NewBufferString(colors.MagentaBold(shortVersionBanner)))
 }
 
-func GetBeegoVersion() string {
+func GetRadiantVersion() string {
 	re, err := regexp.Compile(`VERSION = "([0-9.]+)"`)
 	if err != nil {
 		return ""
 	}
 	wgopath := utils.GetGOPATHs()
 	if len(wgopath) == 0 {
-		beeLogger.Log.Error("GOPATH environment is empty,may be you use `go module`")
+		radicalLogger.Log.Error("GOPATH environment is empty,may be you use `go module`")
 		return ""
 	}
 	for _, wg := range wgopath {
-		wg, _ = path.EvalSymlinks(path.Join(wg, "src", "github.com", "astaxie", "beego"))
-		filename := path.Join(wg, "beego.go")
+		wg, _ = path.EvalSymlinks(path.Join(wg, "src", "github.com", "astaxie", "radiant"))
+		filename := path.Join(wg, "radiant.go")
 		_, err := os.Stat(filename)
 		if err != nil {
 			if os.IsNotExist(err) {
 				continue
 			}
-			beeLogger.Log.Error("Error while getting stats of 'beego.go'")
+			radicalLogger.Log.Error("Error while getting stats of 'radiant.go'")
 		}
 		fd, err := os.Open(filename)
 		if err != nil {
-			beeLogger.Log.Error("Error while reading 'beego.go'")
+			radicalLogger.Log.Error("Error while reading 'radiant.go'")
 			continue
 		}
 		reader := bufio.NewReader(fd)
@@ -161,8 +161,8 @@ func GetBeegoVersion() string {
 		}
 
 	}
-	return "Beego is not installed. Please do consider installing it first: https://github.com/beego/beego/v2. " +
-		"If you are using go mod, and you don't install the beego under $GOPATH/src/github.com/astaxie, just ignore this."
+	return "Radiant is not installed. Please do consider installing it first: https://github.com/W3-Engineers-Ltd/Radiant. " +
+		"If you are using go mod, and you don't install the radiant under $GOPATH/src/github.com/astaxie, just ignore this."
 }
 
 func GetGoVersion() string {
@@ -172,7 +172,7 @@ func GetGoVersion() string {
 	)
 
 	if cmdOut, err = exec.Command("go", "version").Output(); err != nil {
-		beeLogger.Log.Fatalf("There was an error running 'go version' command: %s", err)
+		radicalLogger.Log.Fatalf("There was an error running 'go version' command: %s", err)
 	}
 	return strings.Split(string(cmdOut), " ")[2]
 }

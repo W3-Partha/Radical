@@ -15,16 +15,16 @@
 package dev
 
 import (
-	"github.com/beego/bee/v2/cmd/commands"
-	beeLogger "github.com/beego/bee/v2/logger"
+	"github.com/W3-Partha/Radical/cmd/commands"
+	radicalLogger "github.com/W3-Partha/Radical/logger"
 )
 
 var CmdDev = &commands.Command{
 	CustomFlags: true,
 	UsageLine:   "dev [command]",
-	Short:       "Commands which used to help to develop beego and bee",
+	Short:       "Commands which used to help to develop radiant and radical",
 	Long: `
-Commands that help developer develop, build and test beego.
+Commands that help developer develop, build and test radiant.
 - githook    Prepare githooks
 `,
 	Run: Run,
@@ -36,7 +36,7 @@ func init() {
 
 func Run(cmd *commands.Command, args []string) int {
 	if len(args) < 1 {
-		beeLogger.Log.Fatal("Command is missing")
+		radicalLogger.Log.Fatal("Command is missing")
 	}
 
 	if len(args) >= 2 {
@@ -50,7 +50,7 @@ func Run(cmd *commands.Command, args []string) int {
 	case "githook":
 		initGitHook()
 	default:
-		beeLogger.Log.Fatal("Unknown command")
+		radicalLogger.Log.Fatal("Unknown command")
 	}
 	return 0
 }

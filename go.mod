@@ -1,9 +1,9 @@
-module github.com/beego/bee/v2
+module github.com/W3-Partha/Radical
 
 go 1.13
 
 require (
-	github.com/beego/beego/v2 v2.0.1
+	github.com/W3-Engineers-Ltd/Radiant v1.0.2
 	github.com/davecgh/go-spew v1.1.1
 	github.com/flosch/pongo2 v0.0.0-20200529170236-5abacdfa4915
 	github.com/fsnotify/fsnotify v1.4.9
@@ -17,4 +17,4 @@ require (
 	gopkg.in/yaml.v2 v2.3.0
 )
 
-//replace github.com/beego/beego/v2 => ../beego
+//replace github.com/W3-Engineers-Ltd/Radiant => ../radiant

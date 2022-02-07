@@ -1,12 +1,12 @@
-package beegopro
+package radiantpro
 
-const BeegoToml = `
-	dsn = "root:123456@tcp(127.0.0.1:3306)/beego"
+const RadiantToml = `
+	dsn = "root:123456@tcp(127.0.0.1:3306)/radiant"
 	driver = "mysql"
 	proType = "default"
 	enableModule = []
 	apiPrefix = "/"
-	gitRemotePath = "https://github.com/beego-dev/beego-pro.git"
+	gitRemotePath = "https://github.com/radiant-dev/radiant-pro.git"
 	format = true
 	sourceGen = "text"
 	gitPull = true

@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package beefix
+package radicalfix
 
 import (
 	"fmt"
@@ -24,20 +24,20 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/beego/bee/v2/cmd/commands"
-	beeLogger "github.com/beego/bee/v2/logger"
-	"github.com/beego/bee/v2/logger/colors"
+	"github.com/W3-Partha/Radical/cmd/commands"
+	radicalLogger "github.com/W3-Partha/Radical/logger"
+	"github.com/W3-Partha/Radical/logger/colors"
 )
 
-// fixTo16 upgrade beego to 1.6
+// fixTo16 upgrade radiant to 1.6
 func fixTo16(cmd *commands.Command, args []string) int {
 	output := cmd.Out()
 
-	beeLogger.Log.Info("Upgrading the application...")
+	radicalLogger.Log.Info("Upgrading the application...")
 
 	dir, err := os.Getwd()
 	if err != nil {
-		beeLogger.Log.Fatalf("Error while getting the current working directory: %s", err)
+		radicalLogger.Log.Fatalf("Error while getting the current working directory: %s", err)
 	}
 
 	filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
@@ -56,61 +56,61 @@ func fixTo16(cmd *commands.Command, args []string) int {
 		err = fixFile(path)
 		fmt.Fprintf(output, colors.GreenBold("\tfix\t")+"%s\n", path)
 		if err != nil {
-			beeLogger.Log.Errorf("Could not fix file: %s", err)
+			radicalLogger.Log.Errorf("Could not fix file: %s", err)
 		}
 		return err
 	})
-	beeLogger.Log.Success("Upgrade Done!")
+	radicalLogger.Log.Success("Upgrade Done!")
 	return 0
 }
 
 var rules = []string{
-	"beego.AppName", "beego.BConfig.AppName",
-	"beego.RunMode", "beego.BConfig.RunMode",
-	"beego.RecoverPanic", "beego.BConfig.RecoverPanic",
-	"beego.RouterCaseSensitive", "beego.BConfig.RouterCaseSensitive",
-	"beego.BeegoServerName", "beego.BConfig.ServerName",
-	"beego.EnableGzip", "beego.BConfig.EnableGzip",
-	"beego.ErrorsShow", "beego.BConfig.EnableErrorsShow",
-	"beego.CopyRequestBody", "beego.BConfig.CopyRequestBody",
-	"beego.MaxMemory", "beego.BConfig.MaxMemory",
-	"beego.Graceful", "beego.BConfig.Listen.Graceful",
-	"beego.HttpAddr", "beego.BConfig.Listen.HTTPAddr",
-	"beego.HttpPort", "beego.BConfig.Listen.HTTPPort",
-	"beego.ListenTCP4", "beego.BConfig.Listen.ListenTCP4",
-	"beego.EnableHttpListen", "beego.BConfig.Listen.EnableHTTP",
-	"beego.EnableHttpTLS", "beego.BConfig.Listen.EnableHTTPS",
-	"beego.HttpsAddr", "beego.BConfig.Listen.HTTPSAddr",
-	"beego.HttpsPort", "beego.BConfig.Listen.HTTPSPort",
-	"beego.HttpCertFile", "beego.BConfig.Listen.HTTPSCertFile",
-	"beego.HttpKeyFile", "beego.BConfig.Listen.HTTPSKeyFile",
-	"beego.EnableAdmin", "beego.BConfig.Listen.EnableAdmin",
-	"beego.AdminHttpAddr", "beego.BConfig.Listen.AdminAddr",
-	"beego.AdminHttpPort", "beego.BConfig.Listen.AdminPort",
-	"beego.UseFcgi", "beego.BConfig.Listen.EnableFcgi",
-	"beego.HttpServerTimeOut", "beego.BConfig.Listen.ServerTimeOut",
-	"beego.AutoRender", "beego.BConfig.WebConfig.AutoRender",
-	"beego.ViewsPath", "beego.BConfig.WebConfig.ViewsPath",
-	"beego.StaticDir", "beego.BConfig.WebConfig.StaticDir",
-	"beego.StaticExtensionsToGzip", "beego.BConfig.WebConfig.StaticExtensionsToGzip",
-	"beego.DirectoryIndex", "beego.BConfig.WebConfig.DirectoryIndex",
-	"beego.FlashName", "beego.BConfig.WebConfig.FlashName",
-	"beego.FlashSeperator", "beego.BConfig.WebConfig.FlashSeparator",
-	"beego.EnableDocs", "beego.BConfig.WebConfig.EnableDocs",
-	"beego.XSRFKEY", "beego.BConfig.WebConfig.XSRFKey",
-	"beego.EnableXSRF", "beego.BConfig.WebConfig.EnableXSRF",
-	"beego.XSRFExpire", "beego.BConfig.WebConfig.XSRFExpire",
-	"beego.TemplateLeft", "beego.BConfig.WebConfig.TemplateLeft",
-	"beego.TemplateRight", "beego.BConfig.WebConfig.TemplateRight",
-	"beego.SessionOn", "beego.BConfig.WebConfig.Session.SessionOn",
-	"beego.SessionProvider", "beego.BConfig.WebConfig.Session.SessionProvider",
-	"beego.SessionName", "beego.BConfig.WebConfig.Session.SessionName",
-	"beego.SessionGCMaxLifetime", "beego.BConfig.WebConfig.Session.SessionGCMaxLifetime",
-	"beego.SessionSavePath", "beego.BConfig.WebConfig.Session.SessionProviderConfig",
-	"beego.SessionCookieLifeTime", "beego.BConfig.WebConfig.Session.SessionCookieLifeTime",
-	"beego.SessionAutoSetCookie", "beego.BConfig.WebConfig.Session.SessionAutoSetCookie",
-	"beego.SessionDomain", "beego.BConfig.WebConfig.Session.SessionDomain",
-	"Ctx.Input.CopyBody(", "Ctx.Input.CopyBody(beego.BConfig.MaxMemory",
+	"radiant.AppName", "radiant.BConfig.AppName",
+	"radiant.RunMode", "radiant.BConfig.RunMode",
+	"radiant.RecoverPanic", "radiant.BConfig.RecoverPanic",
+	"radiant.RouterCaseSensitive", "radiant.BConfig.RouterCaseSensitive",
+	"radiant.RadiantServerName", "radiant.BConfig.ServerName",
+	"radiant.EnableGzip", "radiant.BConfig.EnableGzip",
+	"radiant.ErrorsShow", "radiant.BConfig.EnableErrorsShow",
+	"radiant.CopyRequestBody", "radiant.BConfig.CopyRequestBody",
+	"radiant.MaxMemory", "radiant.BConfig.MaxMemory",
+	"radiant.Graceful", "radiant.BConfig.Listen.Graceful",
+	"radiant.HttpAddr", "radiant.BConfig.Listen.HTTPAddr",
+	"radiant.HttpPort", "radiant.BConfig.Listen.HTTPPort",
+	"radiant.ListenTCP4", "radiant.BConfig.Listen.ListenTCP4",
+	"radiant.EnableHttpListen", "radiant.BConfig.Listen.EnableHTTP",
+	"radiant.EnableHttpTLS", "radiant.BConfig.Listen.EnableHTTPS",
+	"radiant.HttpsAddr", "radiant.BConfig.Listen.HTTPSAddr",
+	"radiant.HttpsPort", "radiant.BConfig.Listen.HTTPSPort",
+	"radiant.HttpCertFile", "radiant.BConfig.Listen.HTTPSCertFile",
+	"radiant.HttpKeyFile", "radiant.BConfig.Listen.HTTPSKeyFile",
+	"radiant.EnableAdmin", "radiant.BConfig.Listen.EnableAdmin",
+	"radiant.AdminHttpAddr", "radiant.BConfig.Listen.AdminAddr",
+	"radiant.AdminHttpPort", "radiant.BConfig.Listen.AdminPort",
+	"radiant.UseFcgi", "radiant.BConfig.Listen.EnableFcgi",
+	"radiant.HttpServerTimeOut", "radiant.BConfig.Listen.ServerTimeOut",
+	"radiant.AutoRender", "radiant.BConfig.WebConfig.AutoRender",
+	"radiant.ViewsPath", "radiant.BConfig.WebConfig.ViewsPath",
+	"radiant.StaticDir", "radiant.BConfig.WebConfig.StaticDir",
+	"radiant.StaticExtensionsToGzip", "radiant.BConfig.WebConfig.StaticExtensionsToGzip",
+	"radiant.DirectoryIndex", "radiant.BConfig.WebConfig.DirectoryIndex",
+	"radiant.FlashName", "radiant.BConfig.WebConfig.FlashName",
+	"radiant.FlashSeperator", "radiant.BConfig.WebConfig.FlashSeparator",
+	"radiant.EnableDocs", "radiant.BConfig.WebConfig.EnableDocs",
+	"radiant.XSRFKEY", "radiant.BConfig.WebConfig.XSRFKey",
+	"radiant.EnableXSRF", "radiant.BConfig.WebConfig.EnableXSRF",
+	"radiant.XSRFExpire", "radiant.BConfig.WebConfig.XSRFExpire",
+	"radiant.TemplateLeft", "radiant.BConfig.WebConfig.TemplateLeft",
+	"radiant.TemplateRight", "radiant.BConfig.WebConfig.TemplateRight",
+	"radiant.SessionOn", "radiant.BConfig.WebConfig.Session.SessionOn",
+	"radiant.SessionProvider", "radiant.BConfig.WebConfig.Session.SessionProvider",
+	"radiant.SessionName", "radiant.BConfig.WebConfig.Session.SessionName",
+	"radiant.SessionGCMaxLifetime", "radiant.BConfig.WebConfig.Session.SessionGCMaxLifetime",
+	"radiant.SessionSavePath", "radiant.BConfig.WebConfig.Session.SessionProviderConfig",
+	"radiant.SessionCookieLifeTime", "radiant.BConfig.WebConfig.Session.SessionCookieLifeTime",
+	"radiant.SessionAutoSetCookie", "radiant.BConfig.WebConfig.Session.SessionAutoSetCookie",
+	"radiant.SessionDomain", "radiant.BConfig.WebConfig.Session.SessionDomain",
+	"Ctx.Input.CopyBody(", "Ctx.Input.CopyBody(radiant.BConfig.MaxMemory",
 	".UrlFor(", ".URLFor(",
 	".ServeJson(", ".ServeJSON(",
 	".ServeXml(", ".ServeXML(",
@@ -118,9 +118,9 @@ var rules = []string{
 	".XsrfToken(", ".XSRFToken(",
 	".CheckXsrfCookie(", ".CheckXSRFCookie(",
 	".XsrfFormHtml(", ".XSRFFormHTML(",
-	"beego.UrlFor(", "beego.URLFor(",
-	"beego.GlobalDocApi", "beego.GlobalDocAPI",
-	"beego.Errorhandler", "beego.ErrorHandler",
+	"radiant.UrlFor(", "radiant.URLFor(",
+	"radiant.GlobalDocApi", "radiant.GlobalDocAPI",
+	"radiant.Errorhandler", "radiant.ErrorHandler",
 	"Output.Jsonp(", "Output.JSONP(",
 	"Output.Json(", "Output.JSON(",
 	"Output.Xml(", "Output.XML(",
@@ -142,14 +142,14 @@ var rules = []string{
 	"logs.LoggerInterface", "logs.Logger",
 	"Input.Request", "Input.Context.Request",
 	"Input.Params)", "Input.Params())",
-	"httplib.BeegoHttpSettings", "httplib.BeegoHTTPSettings",
-	"httplib.BeegoHttpRequest", "httplib.BeegoHTTPRequest",
+	"httplib.RadiantHttpSettings", "httplib.RadiantHTTPSettings",
+	"httplib.RadiantHttpRequest", "httplib.RadiantHTTPRequest",
 	".TlsClientConfig", ".TLSClientConfig",
 	".JsonBody", ".JSONBody",
 	".ToJson", ".ToJSON",
 	".ToXml", ".ToXML",
-	"beego.Html2str", "beego.HTML2str",
-	"beego.AssetsCss", "beego.AssetsCSS",
+	"radiant.Html2str", "radiant.HTML2str",
+	"radiant.AssetsCss", "radiant.AssetsCSS",
 	"orm.DR_Sqlite", "orm.DRSqlite",
 	"orm.DR_Postgres", "orm.DRPostgres",
 	"orm.DR_MySQL", "orm.DRMySQL",
@@ -217,7 +217,7 @@ func fixFile(file string) error {
 		fixed = strings.Replace(fixed, "EnableHttpListen", "HTTPEnable", -1)
 		fixed = strings.Replace(fixed, "EnableHttpTLS", "EnableHTTPS", -1)
 		fixed = strings.Replace(fixed, "EnableHttpTLS", "EnableHTTPS", -1)
-		fixed = strings.Replace(fixed, "BeegoServerName", "ServerName", -1)
+		fixed = strings.Replace(fixed, "RadiantServerName", "ServerName", -1)
 		fixed = strings.Replace(fixed, "AdminHttpAddr", "AdminAddr", -1)
 		fixed = strings.Replace(fixed, "AdminHttpPort", "AdminPort", -1)
 		fixed = strings.Replace(fixed, "HttpServerTimeOut", "ServerTimeOut", -1)

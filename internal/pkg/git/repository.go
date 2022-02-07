@@ -8,9 +8,9 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/beego/bee/v2/internal/pkg/command"
-	"github.com/beego/bee/v2/internal/pkg/utils"
-	beeLogger "github.com/beego/bee/v2/logger"
+	"github.com/W3-Partha/Radical/internal/pkg/command"
+	"github.com/W3-Partha/Radical/internal/pkg/utils"
+	radicalLogger "github.com/W3-Partha/Radical/logger"
 )
 
 // git tag
@@ -43,11 +43,11 @@ func CloneRepo(url string, dst string) (err error) {
 		return
 	}
 
-	beeLogger.Log.Info("start git clone from " + url + ", to dst at " + dst)
+	radicalLogger.Log.Info("start git clone from " + url + ", to dst at " + dst)
 	_, stderr, err := command.ExecCmd("git", "clone", url, dst)
 
 	if err != nil {
-		beeLogger.Log.Error("error git clone from " + url + ", to dst at " + dst)
+		radicalLogger.Log.Error("error git clone from " + url + ", to dst at " + dst)
 		return concatenateError(err, stderr)
 	}
 	return nil
@@ -123,7 +123,7 @@ func OpenRepository(repoPath string) (*Repository, error) {
 
 // 拉取代码
 func (repo *Repository) Pull() error {
-	beeLogger.Log.Info("git pull " + repo.Path)
+	radicalLogger.Log.Info("git pull " + repo.Path)
 	_, stderr, err := command.ExecCmdDir(repo.Path, "git", "pull")
 	if err != nil {
 		return concatenateError(err, stderr)

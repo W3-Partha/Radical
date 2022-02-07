@@ -1,4 +1,4 @@
-// Copyright 2013 bee authors
+// Copyright 2013 radical authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License"): you may
 // not use this file except in compliance with the License. You may obtain
@@ -20,11 +20,11 @@ import (
 	"runtime"
 	"strings"
 
-	"github.com/beego/bee/v2/cmd/commands"
-	"github.com/beego/bee/v2/cmd/commands/version"
-	"github.com/beego/bee/v2/config"
-	beeLogger "github.com/beego/bee/v2/logger"
-	"github.com/beego/bee/v2/utils"
+	"github.com/W3-Partha/Radical/cmd/commands"
+	"github.com/W3-Partha/Radical/cmd/commands/version"
+	"github.com/W3-Partha/Radical/config"
+	radicalLogger "github.com/W3-Partha/Radical/logger"
+	"github.com/W3-Partha/Radical/utils"
 )
 
 var CmdRun = &commands.Command{
@@ -75,14 +75,14 @@ func init() {
 	CmdRun.Flag.BoolVar(&vendorWatch, "vendor", false, "Enable watch vendor folder.")
 	CmdRun.Flag.StringVar(&buildTags, "tags", "", "Set the build tags. See: https://golang.org/pkg/go/build/")
 	CmdRun.Flag.StringVar(&buildLDFlags, "ldflags", "", "Set the build ldflags. See: https://golang.org/pkg/go/build/")
-	CmdRun.Flag.StringVar(&runmode, "runmode", "", "Set the Beego run mode.")
+	CmdRun.Flag.StringVar(&runmode, "runmode", "", "Set the Radiant run mode.")
 	CmdRun.Flag.StringVar(&runargs, "runargs", "", "Extra args to run application")
 	CmdRun.Flag.Var(&extraPackages, "ex", "List of extra package to watch.")
 	exit = make(chan bool)
 	commands.AvailableCommands = append(commands.AvailableCommands, CmdRun)
 }
 
-// RunApp locates files to watch, and starts the beego application
+// RunApp locates files to watch, and starts the radiant application
 func RunApp(cmd *commands.Command, args []string) int {
 	// The default app path is the current working directory
 	appPath, _ := os.Getwd()
@@ -102,33 +102,33 @@ func RunApp(cmd *commands.Command, args []string) int {
 			appname = path.Base(appPath)
 			currentGoPath = _gopath
 		} else {
-			beeLogger.Log.Fatalf("No application '%s' found in your GOPATH", appPath)
+			radicalLogger.Log.Fatalf("No application '%s' found in your GOPATH", appPath)
 		}
 		if strings.HasSuffix(appname, ".go") && utils.IsExist(appPath) {
-			beeLogger.Log.Warnf("The appname is in conflict with file's current path. Do you want to build appname as '%s'", appname)
-			beeLogger.Log.Info("Do you want to overwrite it? [yes|no] ")
+			radicalLogger.Log.Warnf("The appname is in conflict with file's current path. Do you want to build appname as '%s'", appname)
+			radicalLogger.Log.Info("Do you want to overwrite it? [yes|no] ")
 			if !utils.AskForConfirmation() {
 				return 0
 			}
 		}
 	} else {
-		beeLogger.Log.Warn("Running application outside of GOPATH")
+		radicalLogger.Log.Warn("Running application outside of GOPATH")
 		appname = path.Base(appPath)
 		currentGoPath = appPath
 	}
 
-	beeLogger.Log.Infof("Using '%s' as 'appname'", appname)
+	radicalLogger.Log.Infof("Using '%s' as 'appname'", appname)
 
-	beeLogger.Log.Debugf("Current path: %s", utils.FILE(), utils.LINE(), appPath)
+	radicalLogger.Log.Debugf("Current path: %s", utils.FILE(), utils.LINE(), appPath)
 
 	if runmode == "prod" || runmode == "dev" {
 		os.Setenv("BEEGO_RUNMODE", runmode)
-		beeLogger.Log.Infof("Using '%s' as 'runmode'", os.Getenv("BEEGO_RUNMODE"))
+		radicalLogger.Log.Infof("Using '%s' as 'runmode'", os.Getenv("BEEGO_RUNMODE"))
 	} else if runmode != "" {
 		os.Setenv("BEEGO_RUNMODE", runmode)
-		beeLogger.Log.Warnf("Using '%s' as 'runmode'", os.Getenv("BEEGO_RUNMODE"))
+		radicalLogger.Log.Warnf("Using '%s' as 'runmode'", os.Getenv("BEEGO_RUNMODE"))
 	} else if os.Getenv("BEEGO_RUNMODE") != "" {
-		beeLogger.Log.Warnf("Using '%s' as 'runmode'", os.Getenv("BEEGO_RUNMODE"))
+		radicalLogger.Log.Warnf("Using '%s' as 'runmode'", os.Getenv("BEEGO_RUNMODE"))
 	}
 
 	var paths []string
@@ -146,7 +146,7 @@ func RunApp(cmd *commands.Command, args []string) int {
 			if found, _, _fullPath := utils.SearchGOPATHs(packagePath); found {
 				readAppDirectories(_fullPath, &paths)
 			} else {
-				beeLogger.Log.Warnf("No extra package '%s' found in your GOPATH", packagePath)
+				radicalLogger.Log.Warnf("No extra package '%s' found in your GOPATH", packagePath)
 			}
 		}
 		// let paths unique
@@ -239,16 +239,16 @@ func isExcluded(filePath string) bool {
 	for _, p := range excludedPaths {
 		absP, err := path.Abs(p)
 		if err != nil {
-			beeLogger.Log.Errorf("Cannot get absolute path of '%s'", p)
+			radicalLogger.Log.Errorf("Cannot get absolute path of '%s'", p)
 			continue
 		}
 		absFilePath, err := path.Abs(filePath)
 		if err != nil {
-			beeLogger.Log.Errorf("Cannot get absolute path of '%s'", filePath)
+			radicalLogger.Log.Errorf("Cannot get absolute path of '%s'", filePath)
 			break
 		}
 		if strings.HasPrefix(absFilePath, absP) {
-			beeLogger.Log.Infof("'%s' is not being watched", filePath)
+			radicalLogger.Log.Infof("'%s' is not being watched", filePath)
 			return true
 		}
 	}

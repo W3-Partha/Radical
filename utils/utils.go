@@ -1,4 +1,4 @@
-// Copyright 2013 bee authors
+// Copyright 2013 radical authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License"): you may
 // not use this file except in compliance with the License. You may obtain
@@ -32,17 +32,17 @@ import (
 	"time"
 	"unicode"
 
-	"github.com/beego/bee/v2/config"
-	"github.com/beego/bee/v2/internal/pkg/system"
-	beeLogger "github.com/beego/bee/v2/logger"
-	"github.com/beego/bee/v2/logger/colors"
+	"github.com/W3-Partha/Radical/config"
+	"github.com/W3-Partha/Radical/internal/pkg/system"
+	radicalLogger "github.com/W3-Partha/Radical/logger"
+	"github.com/W3-Partha/Radical/logger/colors"
 )
 
 type tagName struct {
 	Name string `json:"name"`
 }
 
-func GetBeeWorkPath() string {
+func GetRadicalWorkPath() string {
 	curpath, err := os.Getwd()
 	if err != nil {
 		panic(err)
@@ -85,13 +85,13 @@ func IsInGOPATH(thePath string) bool {
 	return false
 }
 
-// IsBeegoProject checks whether the current path is a Beego application or not
-func IsBeegoProject(thePath string) bool {
+// IsRadiantProject checks whether the current path is a Radiant application or not
+func IsRadiantProject(thePath string) bool {
 	mainFiles := []string{}
-	hasBeegoRegex := regexp.MustCompile(`(?s)package main.*?import.*?\(.*?github.com/beego/beego/v2".*?\).*func main()`)
+	hasRadiantRegex := regexp.MustCompile(`(?s)package main.*?import.*?\(.*?github.com/W3-Engineers-Ltd/Radiant".*?\).*func main()`)
 	c := make(chan error)
 	// Walk the application path tree to look for main files.
-	// Main files must satisfy the 'hasBeegoRegex' regular expression.
+	// Main files must satisfy the 'hasRadiantRegex' regular expression.
 	go func() {
 		filepath.Walk(thePath, func(fpath string, f os.FileInfo, err error) error {
 			if err != nil {
@@ -106,7 +106,7 @@ func IsBeegoProject(thePath string) bool {
 					return nil
 				}
 
-				if len(hasBeegoRegex.Find(data)) > 0 {
+				if len(hasRadiantRegex.Find(data)) > 0 {
 					mainFiles = append(mainFiles, fpath)
 				}
 			}
@@ -116,7 +116,7 @@ func IsBeegoProject(thePath string) bool {
 	}()
 
 	if err := <-c; err != nil {
-		beeLogger.Log.Fatalf("Unable to walk '%s' tree: %s", thePath, err)
+		radicalLogger.Log.Fatalf("Unable to walk '%s' tree: %s", thePath, err)
 	}
 
 	if len(mainFiles) > 0 {
@@ -130,7 +130,7 @@ func IsBeegoProject(thePath string) bool {
 func SearchGOPATHs(app string) (bool, string, string) {
 	gps := GetGOPATHs()
 	if len(gps) == 0 {
-		beeLogger.Log.Fatal("GOPATH environment variable is not set or empty")
+		radicalLogger.Log.Fatal("GOPATH environment variable is not set or empty")
 	}
 
 	// Lookup the application inside the user workspace(s)
@@ -160,7 +160,7 @@ func AskForConfirmation() bool {
 	var response string
 	_, err := fmt.Scanln(&response)
 	if err != nil {
-		beeLogger.Log.Fatalf("%s", err)
+		radicalLogger.Log.Fatalf("%s", err)
 	}
 	okayResponses := []string{"y", "Y", "yes", "Yes", "YES"}
 	nokayResponses := []string{"n", "N", "no", "No", "NO"}
@@ -239,7 +239,7 @@ func CamelCase(in string) string {
 func FormatSourceCode(filename string) {
 	cmd := exec.Command("gofmt", "-w", filename)
 	if err := cmd.Run(); err != nil {
-		beeLogger.Log.Warnf("Error while running gofmt: %s", err)
+		radicalLogger.Log.Warnf("Error while running gofmt: %s", err)
 	}
 }
 
@@ -278,8 +278,8 @@ func LINE() int {
 	return line
 }
 
-// BeeFuncMap returns a FuncMap of functions used in different templates.
-func BeeFuncMap() template.FuncMap {
+// RadicalFuncMap returns a FuncMap of functions used in different templates.
+func RadicalFuncMap() template.FuncMap {
 	return template.FuncMap{
 		"trim":       strings.TrimSpace,
 		"bold":       colors.Bold,
@@ -292,7 +292,7 @@ func BeeFuncMap() template.FuncMap {
 
 // TmplToString parses a text template and return the result as a string.
 func TmplToString(tmpl string, data interface{}) string {
-	t := template.New("tmpl").Funcs(BeeFuncMap())
+	t := template.New("tmpl").Funcs(RadicalFuncMap())
 	template.Must(t.Parse(tmpl))
 
 	var doc bytes.Buffer
@@ -310,20 +310,20 @@ func EndLine() string {
 func Tmpl(text string, data interface{}) {
 	output := colors.NewColorWriter(os.Stderr)
 
-	t := template.New("Usage").Funcs(BeeFuncMap())
+	t := template.New("Usage").Funcs(RadicalFuncMap())
 	template.Must(t.Parse(text))
 
 	err := t.Execute(output, data)
 	if err != nil {
-		beeLogger.Log.Error(err.Error())
+		radicalLogger.Log.Error(err.Error())
 	}
 }
 
 func CheckEnv(appname string) (apppath, packpath string, err error) {
 	gps := GetGOPATHs()
 	if len(gps) == 0 {
-		beeLogger.Log.Error("if you want new a go module project,please add param `-gopath=false`.")
-		beeLogger.Log.Fatal("GOPATH environment variable is not set or empty")
+		radicalLogger.Log.Error("if you want new a go module project,please add param `-gopath=false`.")
+		radicalLogger.Log.Fatal("GOPATH environment variable is not set or empty")
 	}
 	currpath, _ := os.Getwd()
 	currpath = filepath.Join(currpath, appname)
@@ -339,15 +339,15 @@ func CheckEnv(appname string) (apppath, packpath string, err error) {
 	// we use the first path
 	gopath := gps[0]
 
-	beeLogger.Log.Warn("You current workdir is not inside $GOPATH/src.")
-	beeLogger.Log.Debugf("GOPATH: %s", FILE(), LINE(), gopath)
+	radicalLogger.Log.Warn("You current workdir is not inside $GOPATH/src.")
+	radicalLogger.Log.Debugf("GOPATH: %s", FILE(), LINE(), gopath)
 
 	gosrcpath := filepath.Join(gopath, "src")
 	apppath = filepath.Join(gosrcpath, appname)
 
 	if _, e := os.Stat(apppath); !os.IsNotExist(e) {
 		err = fmt.Errorf("cannot create application without removing '%s' first", apppath)
-		beeLogger.Log.Errorf("Path '%s' already exists", apppath)
+		radicalLogger.Log.Errorf("Path '%s' already exists", apppath)
 		return
 	}
 	packpath = strings.Join(strings.Split(apppath[len(gosrcpath)+1:], string(filepath.Separator)), "/")
@@ -430,14 +430,14 @@ func GetFileModTime(path string) int64 {
 	path = strings.Replace(path, "\\", "/", -1)
 	f, err := os.Open(path)
 	if err != nil {
-		beeLogger.Log.Errorf("Failed to open file on '%s': %s", path, err)
+		radicalLogger.Log.Errorf("Failed to open file on '%s': %s", path, err)
 		return time.Now().Unix()
 	}
 	defer f.Close()
 
 	fi, err := f.Stat()
 	if err != nil {
-		beeLogger.Log.Errorf("Failed to get file stats: %s", err)
+		radicalLogger.Log.Errorf("Failed to get file stats: %s", err)
 		return time.Now().Unix()
 	}
 
@@ -464,7 +464,7 @@ func GetGoVersionSkipMinor() string {
 
 func IsGOMODULE() bool {
 	if combinedOutput, e := exec.Command(`go`, `env`).CombinedOutput(); e != nil {
-		beeLogger.Log.Errorf("i cann't find go.")
+		radicalLogger.Log.Errorf("i cann't find go.")
 	} else {
 		regex := regexp.MustCompile(`GOMOD="?(.+go.mod)"?`)
 		stringSubmatch := regex.FindStringSubmatch(string(combinedOutput))
@@ -473,34 +473,34 @@ func IsGOMODULE() bool {
 	return false
 }
 
-func NoticeUpdateBee() {
+func NoticeUpdateRadical() {
 	cmd := exec.Command("go", "version")
 	cmd.Output()
 	if cmd.Process == nil || cmd.Process.Pid <= 0 {
-		beeLogger.Log.Warn("There is no go environment")
+		radicalLogger.Log.Warn("There is no go environment")
 		return
 	}
-	beeHome := system.BeegoHome
-	if !IsExist(beeHome) {
-		if err := os.MkdirAll(beeHome, 0755); err != nil {
-			beeLogger.Log.Fatalf("Could not create the directory: %s", err)
+	radicalHome := system.RadiantHome
+	if !IsExist(radicalHome) {
+		if err := os.MkdirAll(radicalHome, 0755); err != nil {
+			radicalLogger.Log.Fatalf("Could not create the directory: %s", err)
 			return
 		}
 	}
-	fp := beeHome + "/.noticeUpdateBee"
+	fp := radicalHome + "/.noticeUpdateRadical"
 	timeNow := time.Now().Unix()
 	var timeOld int64
 	if !IsExist(fp) {
 		f, err := os.Create(fp)
 		if err != nil {
-			beeLogger.Log.Warnf("Create noticeUpdateBee file err: %s", err)
+			radicalLogger.Log.Warnf("Create noticeUpdateRadical file err: %s", err)
 			return
 		}
 		defer f.Close()
 	}
 	oldContent, err := ioutil.ReadFile(fp)
 	if err != nil {
-		beeLogger.Log.Warnf("Read noticeUpdateBee file err: %s", err)
+		radicalLogger.Log.Warnf("Read noticeUpdateRadical file err: %s", err)
 		return
 	}
 	timeOld, _ = strconv.ParseInt(string(oldContent), 10, 64)
@@ -509,45 +509,45 @@ func NoticeUpdateBee() {
 	}
 	w, err := os.OpenFile(fp, os.O_WRONLY|os.O_TRUNC, 0644)
 	if err != nil {
-		beeLogger.Log.Warnf("Open noticeUpdateBee file err: %s", err)
+		radicalLogger.Log.Warnf("Open noticeUpdateRadical file err: %s", err)
 		return
 	}
 	defer w.Close()
 	timeNowStr := strconv.FormatInt(timeNow, 10)
 	if _, err := w.WriteString(timeNowStr); err != nil {
-		beeLogger.Log.Warnf("Update noticeUpdateBee file err: %s", err)
+		radicalLogger.Log.Warnf("Update noticeUpdateRadical file err: %s", err)
 		return
 	}
-	beeLogger.Log.Info("Getting bee latest version...")
-	versionLast := BeeLastVersion()
+	radicalLogger.Log.Info("Getting radical latest version...")
+	versionLast := RadicalLastVersion()
 	versionNow := config.Version
 	if versionLast == "" {
-		beeLogger.Log.Warn("Get latest version err")
+		radicalLogger.Log.Warn("Get latest version err")
 		return
 	}
 	if versionNow != versionLast {
-		beeLogger.Log.Warnf("Update available %s ==> %s", versionNow, versionLast)
-		beeLogger.Log.Warn("Run `bee update` to update")
+		radicalLogger.Log.Warnf("Update available %s ==> %s", versionNow, versionLast)
+		radicalLogger.Log.Warn("Run `radical update` to update")
 	}
-	beeLogger.Log.Info("Your bee are up to date")
+	radicalLogger.Log.Info("Your radical are up to date")
 }
 
-func BeeLastVersion() (version string) {
-	var url = "https://api.github.com/repos/beego/bee/tags"
+func RadicalLastVersion() (version string) {
+	var url = "https://api.github.com/repos/radiant/radical/tags"
 	resp, err := http.Get(url)
 	if err != nil {
-		beeLogger.Log.Warnf("Get bee tags from github error: %s", err)
+		radicalLogger.Log.Warnf("Get radical tags from github error: %s", err)
 		return
 	}
 	defer resp.Body.Close()
 	bodyContent, _ := ioutil.ReadAll(resp.Body)
 	var tags []tagName
 	if err = json.Unmarshal(bodyContent, &tags); err != nil {
-		beeLogger.Log.Warnf("Unmarshal tags body error: %s", err)
+		radicalLogger.Log.Warnf("Unmarshal tags body error: %s", err)
 		return
 	}
 	if len(tags) < 1 {
-		beeLogger.Log.Warn("There is no tags！")
+		radicalLogger.Log.Warn("There is no tags！")
 		return
 	}
 	last := tags[0]
@@ -556,6 +556,6 @@ func BeeLastVersion() (version string) {
 	if len(versionList) > 0 {
 		return versionList[0]
 	}
-	beeLogger.Log.Warn("There is no tags！")
+	radicalLogger.Log.Warn("There is no tags！")
 	return
 }

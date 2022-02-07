@@ -6,12 +6,12 @@ import (
 	"path/filepath"
 )
 
-// Bee System Params ...
+// Radical System Params ...
 var (
-	Usr, _     = user.Current()
-	BeegoHome  = filepath.Join(Usr.HomeDir, "/.beego")
-	CurrentDir = getCurrentDirectory()
-	GoPath     = os.Getenv("GOPATH")
+	Usr, _      = user.Current()
+	RadiantHome = filepath.Join(Usr.HomeDir, "/.radiant")
+	CurrentDir  = getCurrentDirectory()
+	GoPath      = os.Getenv("GOPATH")
 )
 
 func getCurrentDirectory() string {

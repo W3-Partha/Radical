@@ -3,22 +3,22 @@ package utils
 import (
 	"os"
 
-	beeLogger "github.com/beego/bee/v2/logger"
+	radicalLogger "github.com/W3-Partha/Radical/logger"
 )
 
 // Mkdir ...
 func Mkdir(dir string) bool {
 	if dir == "" {
-		beeLogger.Log.Fatalf("The directory is empty")
+		radicalLogger.Log.Fatalf("The directory is empty")
 		return false
 	}
 	err := os.MkdirAll(dir, 0755)
 	if err != nil {
-		beeLogger.Log.Fatalf("Could not create the directory: %s", err)
+		radicalLogger.Log.Fatalf("Could not create the directory: %s", err)
 		return false
 	}
 
-	beeLogger.Log.Infof("Create %s Success!", dir)
+	radicalLogger.Log.Infof("Create %s Success!", dir)
 	return true
 }
 

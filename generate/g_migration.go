@@ -1,4 +1,4 @@
-// Copyright 2013 bee authors
+// Copyright 2013 radical authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License"): you may
 // not use this file except in compliance with the License. You may obtain
@@ -21,9 +21,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/beego/bee/v2/logger"
-	"github.com/beego/bee/v2/logger/colors"
-	"github.com/beego/bee/v2/utils"
+	"github.com/W3-Partha/Radical/logger"
+	"github.com/W3-Partha/Radical/logger/colors"
+	"github.com/W3-Partha/Radical/utils"
 )
 
 const (
@@ -55,12 +55,12 @@ func (m mysqlDriver) generateSQLFromFields(fields string) string {
 	for i, v := range fds {
 		kv := strings.SplitN(v, ":", 2)
 		if len(kv) != 2 {
-			beeLogger.Log.Error("Fields format is wrong. Should be: key:type,key:type " + v)
+			radicalLogger.Log.Error("Fields format is wrong. Should be: key:type,key:type " + v)
 			return ""
 		}
 		typ, tag := m.getSQLType(kv[1])
 		if typ == "" {
-			beeLogger.Log.Error("Fields format is wrong. Should be: key:type,key:type " + v)
+			radicalLogger.Log.Error("Fields format is wrong. Should be: key:type,key:type " + v)
 			return ""
 		}
 		if i == 0 && strings.ToLower(kv[0]) != "id" {
@@ -124,12 +124,12 @@ func (m postgresqlDriver) generateSQLFromFields(fields string) string {
 	for i, v := range fds {
 		kv := strings.SplitN(v, ":", 2)
 		if len(kv) != 2 {
-			beeLogger.Log.Error("Fields format is wrong. Should be: key:type,key:type " + v)
+			radicalLogger.Log.Error("Fields format is wrong. Should be: key:type,key:type " + v)
 			return ""
 		}
 		typ, tag := m.getSQLType(kv[1])
 		if typ == "" {
-			beeLogger.Log.Error("Fields format is wrong. Should be: key:type,key:type " + v)
+			radicalLogger.Log.Error("Fields format is wrong. Should be: key:type,key:type " + v)
 			return ""
 		}
 		if i == 0 && strings.ToLower(kv[0]) != "id" {
@@ -181,7 +181,7 @@ func NewDBDriver() DBDriver {
 	case "postgres":
 		return postgresqlDriver{}
 	default:
-		beeLogger.Log.Fatal("Driver not supported")
+		radicalLogger.Log.Fatal("Driver not supported")
 		return nil
 	}
 }
@@ -195,7 +195,7 @@ func GenerateMigration(mname, upsql, downsql, curpath string) {
 	if _, err := os.Stat(migrationFilePath); os.IsNotExist(err) {
 		// create migrations directory
 		if err := os.MkdirAll(migrationFilePath, 0777); err != nil {
-			beeLogger.Log.Fatalf("Could not create migration directory: %s", err)
+			radicalLogger.Log.Fatalf("Could not create migration directory: %s", err)
 		}
 	}
 	// create file
@@ -231,14 +231,14 @@ func GenerateMigration(mname, upsql, downsql, curpath string) {
 		utils.FormatSourceCode(fpath)
 		fmt.Fprintf(w, "\t%s%screate%s\t %s%s\n", "\x1b[32m", "\x1b[1m", "\x1b[21m", fpath, "\x1b[0m")
 	} else {
-		beeLogger.Log.Fatalf("Could not create migration file: %s", err)
+		radicalLogger.Log.Fatalf("Could not create migration file: %s", err)
 	}
 }
 
 const (
 	MigrationHeader = `package main
 						import (
-							"github.com/beego/beego/v2/client/orm/migration"
+							"github.com/W3-Engineers-Ltd/Radiant/client/orm/migration"
 						)
 
 						// DO NOT MODIFY
@@ -257,7 +257,7 @@ const (
 
 	DDLSpecCreate = `
 				/*
-				refer beego/migration/doc.go
+				refer radiant/migration/doc.go
 				*/
 				func(m *{{StructName}}) ddlSpec(){
 				m.CreateTable("{{tableName}}", "InnoDB", "utf8")
@@ -267,7 +267,7 @@ const (
 				`
 	DDLSpecAlter = `
 				/*
-				refer beego/migration/doc.go
+				refer radiant/migration/doc.go
 				*/
 				func(m *{{StructName}}) ddlSpec(){
 				m.AlterTable("{{tableName}}")

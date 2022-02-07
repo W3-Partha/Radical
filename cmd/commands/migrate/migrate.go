@@ -1,4 +1,4 @@
-// Copyright 2013 bee authors
+// Copyright 2013 radical authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License"): you may
 // not use this file except in compliance with the License. You may obtain
@@ -23,12 +23,12 @@ import (
 	"strings"
 	"time"
 
-	"github.com/beego/bee/v2/cmd/commands"
-	"github.com/beego/bee/v2/cmd/commands/version"
-	"github.com/beego/bee/v2/config"
-	"github.com/beego/bee/v2/utils"
+	"github.com/W3-Partha/Radical/cmd/commands"
+	"github.com/W3-Partha/Radical/cmd/commands/version"
+	"github.com/W3-Partha/Radical/config"
+	"github.com/W3-Partha/Radical/utils"
 
-	beeLogger "github.com/beego/bee/v2/logger"
+	radicalLogger "github.com/W3-Partha/Radical/logger"
 )
 
 var CmdMigrate = &commands.Command{
@@ -38,19 +38,19 @@ var CmdMigrate = &commands.Command{
 
   ▶ {{"To run all the migrations:"|bold}}
 
-    $ bee migrate [-driver=mysql] [-conn="root:@tcp(127.0.0.1:3306)/test"] [-dir="path/to/migration"]
+    $ radical migrate [-driver=mysql] [-conn="root:@tcp(127.0.0.1:3306)/test"] [-dir="path/to/migration"]
 
   ▶ {{"To rollback the last migration:"|bold}}
 
-    $ bee migrate rollback [-driver=mysql] [-conn="root:@tcp(127.0.0.1:3306)/test"] [-dir="path/to/migration"]
+    $ radical migrate rollback [-driver=mysql] [-conn="root:@tcp(127.0.0.1:3306)/test"] [-dir="path/to/migration"]
 
   ▶ {{"To do a reset, which will rollback all the migrations:"|bold}}
 
-    $ bee migrate reset [-driver=mysql] [-conn="root:@tcp(127.0.0.1:3306)/test"] [-dir="path/to/migration"]
+    $ radical migrate reset [-driver=mysql] [-conn="root:@tcp(127.0.0.1:3306)/test"] [-dir="path/to/migration"]
 
   ▶ {{"To update your schema:"|bold}}
 
-    $ bee migrate refresh [-driver=mysql] [-conn="root:@tcp(127.0.0.1:3306)/test"] [-dir="path/to/migration"]
+    $ radical migrate refresh [-driver=mysql] [-conn="root:@tcp(127.0.0.1:3306)/test"] [-dir="path/to/migration"]
 `,
 	PreRun: func(cmd *commands.Command, args []string) { version.ShowShortVersionBanner() },
 	Run:    RunMigration,
@@ -94,10 +94,10 @@ func RunMigration(cmd *commands.Command, args []string) int {
 		}
 	}
 
-	beeLogger.Log.Infof("Using '%s' as 'driver'", mDriver)
+	radicalLogger.Log.Infof("Using '%s' as 'driver'", mDriver)
 	//Log sensitive connection information only when DEBUG is set to true.
-	beeLogger.Log.Debugf("Conn: %s", utils.FILE(), utils.LINE(), mConn)
-	beeLogger.Log.Infof("Using '%s' as 'dir'", mDir)
+	radicalLogger.Log.Debugf("Conn: %s", utils.FILE(), utils.LINE(), mConn)
+	radicalLogger.Log.Infof("Using '%s' as 'dir'", mDir)
 	driverStr, connStr, dirStr := string(mDriver), string(mConn), string(mDir)
 
 	dirRune := []rune(dirStr)
@@ -108,25 +108,25 @@ func RunMigration(cmd *commands.Command, args []string) int {
 
 	if len(args) == 0 {
 		// run all outstanding migrations
-		beeLogger.Log.Info("Running all outstanding migrations")
+		radicalLogger.Log.Info("Running all outstanding migrations")
 		MigrateUpdate(currpath, driverStr, connStr, dirStr)
 	} else {
 		mcmd := args[0]
 		switch mcmd {
 		case "rollback":
-			beeLogger.Log.Info("Rolling back the last migration operation")
+			radicalLogger.Log.Info("Rolling back the last migration operation")
 			MigrateRollback(currpath, driverStr, connStr, dirStr)
 		case "reset":
-			beeLogger.Log.Info("Reseting all migrations")
+			radicalLogger.Log.Info("Reseting all migrations")
 			MigrateReset(currpath, driverStr, connStr, dirStr)
 		case "refresh":
-			beeLogger.Log.Info("Refreshing all migrations")
+			radicalLogger.Log.Info("Refreshing all migrations")
 			MigrateRefresh(currpath, driverStr, connStr, dirStr)
 		default:
-			beeLogger.Log.Fatal("Command is missing")
+			radicalLogger.Log.Fatal("Command is missing")
 		}
 	}
-	beeLogger.Log.Success("Migration successful!")
+	radicalLogger.Log.Success("Migration successful!")
 	return 0
 }
 
@@ -145,7 +145,7 @@ func migrate(goal, currpath, driver, connStr, dir string) {
 	// Connect to database
 	db, err := sql.Open(driver, connStr)
 	if err != nil {
-		beeLogger.Log.Fatalf("Could not connect to database using '%s': %s", connStr, err)
+		radicalLogger.Log.Fatalf("Could not connect to database using '%s': %s", connStr, err)
 	}
 	defer db.Close()
 
@@ -163,44 +163,44 @@ func migrate(goal, currpath, driver, connStr, dir string) {
 func checkForSchemaUpdateTable(db *sql.DB, driver string) {
 	showTableSQL := showMigrationsTableSQL(driver)
 	if rows, err := db.Query(showTableSQL); err != nil {
-		beeLogger.Log.Fatalf("Could not show migrations table: %s", err)
+		radicalLogger.Log.Fatalf("Could not show migrations table: %s", err)
 	} else if !rows.Next() {
 		// No migrations table, create new ones
 		createTableSQL := createMigrationsTableSQL(driver)
 
-		beeLogger.Log.Infof("Creating 'migrations' table...")
+		radicalLogger.Log.Infof("Creating 'migrations' table...")
 
 		if _, err := db.Query(createTableSQL); err != nil {
-			beeLogger.Log.Fatalf("Could not create migrations table: %s", err)
+			radicalLogger.Log.Fatalf("Could not create migrations table: %s", err)
 		}
 	}
 
 	// Checking that migrations table schema are expected
 	selectTableSQL := selectMigrationsTableSQL(driver)
 	if rows, err := db.Query(selectTableSQL); err != nil {
-		beeLogger.Log.Fatalf("Could not show columns of migrations table: %s", err)
+		radicalLogger.Log.Fatalf("Could not show columns of migrations table: %s", err)
 	} else {
 		for rows.Next() {
 			var fieldBytes, typeBytes, nullBytes, keyBytes, defaultBytes, extraBytes []byte
 			if err := rows.Scan(&fieldBytes, &typeBytes, &nullBytes, &keyBytes, &defaultBytes, &extraBytes); err != nil {
-				beeLogger.Log.Fatalf("Could not read column information: %s", err)
+				radicalLogger.Log.Fatalf("Could not read column information: %s", err)
 			}
 			fieldStr, typeStr, nullStr, keyStr, defaultStr, extraStr :=
 				string(fieldBytes), string(typeBytes), string(nullBytes), string(keyBytes), string(defaultBytes), string(extraBytes)
 			if fieldStr == "id_migration" {
 				if keyStr != "PRI" || extraStr != "auto_increment" {
-					beeLogger.Log.Hint("Expecting KEY: PRI, EXTRA: auto_increment")
-					beeLogger.Log.Fatalf("Column migration.id_migration type mismatch: KEY: %s, EXTRA: %s", keyStr, extraStr)
+					radicalLogger.Log.Hint("Expecting KEY: PRI, EXTRA: auto_increment")
+					radicalLogger.Log.Fatalf("Column migration.id_migration type mismatch: KEY: %s, EXTRA: %s", keyStr, extraStr)
 				}
 			} else if fieldStr == "name" {
 				if !strings.HasPrefix(typeStr, "varchar") || nullStr != "YES" {
-					beeLogger.Log.Hint("Expecting TYPE: varchar, NULL: YES")
-					beeLogger.Log.Fatalf("Column migration.name type mismatch: TYPE: %s, NULL: %s", typeStr, nullStr)
+					radicalLogger.Log.Hint("Expecting TYPE: varchar, NULL: YES")
+					radicalLogger.Log.Fatalf("Column migration.name type mismatch: TYPE: %s, NULL: %s", typeStr, nullStr)
 				}
 			} else if fieldStr == "created_at" {
 				if typeStr != "timestamp" || (!strings.EqualFold(defaultStr, "CURRENT_TIMESTAMP") && !strings.EqualFold(defaultStr, "CURRENT_TIMESTAMP()")) {
-					beeLogger.Log.Hint("Expecting TYPE: timestamp, DEFAULT: CURRENT_TIMESTAMP || CURRENT_TIMESTAMP()")
-					beeLogger.Log.Fatalf("Column migration.timestamp type mismatch: TYPE: %s, DEFAULT: %s", typeStr, defaultStr)
+					radicalLogger.Log.Hint("Expecting TYPE: timestamp, DEFAULT: CURRENT_TIMESTAMP || CURRENT_TIMESTAMP()")
+					radicalLogger.Log.Fatalf("Column migration.timestamp type mismatch: TYPE: %s, DEFAULT: %s", typeStr, defaultStr)
 				}
 			}
 		}
@@ -255,22 +255,22 @@ func selectMigrationsTableSQL(driver string) string {
 func getLatestMigration(db *sql.DB, goal string) (file string, createdAt int64) {
 	sql := "SELECT name FROM migrations where status = 'update' ORDER BY id_migration DESC LIMIT 1"
 	if rows, err := db.Query(sql); err != nil {
-		beeLogger.Log.Fatalf("Could not retrieve migrations: %s", err)
+		radicalLogger.Log.Fatalf("Could not retrieve migrations: %s", err)
 	} else {
 		if rows.Next() {
 			if err := rows.Scan(&file); err != nil {
-				beeLogger.Log.Fatalf("Could not read migrations in database: %s", err)
+				radicalLogger.Log.Fatalf("Could not read migrations in database: %s", err)
 			}
 			createdAtStr := file[len(file)-15:]
 			if t, err := time.Parse("20060102_150405", createdAtStr); err != nil {
-				beeLogger.Log.Fatalf("Could not parse time: %s", err)
+				radicalLogger.Log.Fatalf("Could not parse time: %s", err)
 			} else {
 				createdAt = t.Unix()
 			}
 		} else {
 			// migration table has no 'update' record, no point rolling back
 			if goal == "rollback" {
-				beeLogger.Log.Fatal("There is nothing to rollback")
+				radicalLogger.Log.Fatal("There is nothing to rollback")
 			}
 			file, createdAt = "", 0
 		}
@@ -282,7 +282,7 @@ func getLatestMigration(db *sql.DB, goal string) (file string, createdAt int64) 
 func writeMigrationSourceFile(dir, source, driver, connStr string, latestTime int64, latestName string, task string) {
 	changeDir(dir)
 	if f, err := os.OpenFile(source, os.O_CREATE|os.O_EXCL|os.O_RDWR, 0666); err != nil {
-		beeLogger.Log.Fatalf("Could not create file: %s", err)
+		radicalLogger.Log.Fatalf("Could not create file: %s", err)
 	} else {
 		content := strings.Replace(MigrationMainTPL, "{{DBDriver}}", driver, -1)
 		content = strings.Replace(content, "{{DriverRepo}}", driverImportStatement(driver), -1)
@@ -291,7 +291,7 @@ func writeMigrationSourceFile(dir, source, driver, connStr string, latestTime in
 		content = strings.Replace(content, "{{LatestName}}", latestName, -1)
 		content = strings.Replace(content, "{{Task}}", task, -1)
 		if _, err := f.WriteString(content); err != nil {
-			beeLogger.Log.Fatalf("Could not write to file: %s", err)
+			radicalLogger.Log.Fatalf("Could not write to file: %s", err)
 		}
 		utils.CloseFile(f)
 	}
@@ -302,7 +302,7 @@ func buildMigrationBinary(dir, binary string) {
 	changeDir(dir)
 	cmd := exec.Command("go", "build", "-o", binary)
 	if out, err := cmd.CombinedOutput(); err != nil {
-		beeLogger.Log.Errorf("Could not build migration binary: %s", err)
+		radicalLogger.Log.Errorf("Could not build migration binary: %s", err)
 		formatShellErrOutput(string(out))
 		removeTempFile(dir, binary)
 		removeTempFile(dir, binary+".go")
@@ -316,7 +316,7 @@ func runMigrationBinary(dir, binary string) {
 	cmd := exec.Command("./" + binary)
 	if out, err := cmd.CombinedOutput(); err != nil {
 		formatShellOutput(string(out))
-		beeLogger.Log.Errorf("Could not run migration binary: %s", err)
+		radicalLogger.Log.Errorf("Could not run migration binary: %s", err)
 		removeTempFile(dir, binary)
 		removeTempFile(dir, binary+".go")
 		os.Exit(2)
@@ -329,7 +329,7 @@ func runMigrationBinary(dir, binary string) {
 // It exits the system when encouter an error
 func changeDir(dir string) {
 	if err := os.Chdir(dir); err != nil {
-		beeLogger.Log.Fatalf("Could not find migration directory: %s", err)
+		radicalLogger.Log.Fatalf("Could not find migration directory: %s", err)
 	}
 }
 
@@ -337,7 +337,7 @@ func changeDir(dir string) {
 func removeTempFile(dir, file string) {
 	changeDir(dir)
 	if err := os.Remove(file); err != nil {
-		beeLogger.Log.Warnf("Could not remove temporary file: %s", err)
+		radicalLogger.Log.Warnf("Could not remove temporary file: %s", err)
 	}
 }
 
@@ -345,7 +345,7 @@ func removeTempFile(dir, file string) {
 func formatShellErrOutput(o string) {
 	for _, line := range strings.Split(o, "\n") {
 		if line != "" {
-			beeLogger.Log.Errorf("|> %s", line)
+			radicalLogger.Log.Errorf("|> %s", line)
 		}
 	}
 }
@@ -354,7 +354,7 @@ func formatShellErrOutput(o string) {
 func formatShellOutput(o string) {
 	for _, line := range strings.Split(o, "\n") {
 		if line != "" {
-			beeLogger.Log.Infof("|> %s", line)
+			radicalLogger.Log.Infof("|> %s", line)
 		}
 	}
 }
@@ -366,8 +366,8 @@ const (
 import(
 	"os"
 
-	"github.com/beego/beego/v2/client/orm"
-	"github.com/beego/beego/v2/client/orm/migration"
+	"github.com/W3-Engineers-Ltd/Radiant/client/orm"
+	"github.com/W3-Engineers-Ltd/Radiant/client/orm/migration"
 
 	_ "{{DriverRepo}}"
 )

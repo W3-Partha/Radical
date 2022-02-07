@@ -1,10 +1,10 @@
-package beegopro
+package radiantpro
 
 import (
 	"strings"
 	"unicode/utf8"
 
-	"github.com/beego/bee/v2/utils"
+	"github.com/W3-Partha/Radical/utils"
 	"github.com/flosch/pongo2"
 )
 

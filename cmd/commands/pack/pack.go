@@ -18,21 +18,21 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/beego/bee/v2/cmd/commands"
-	"github.com/beego/bee/v2/cmd/commands/version"
-	beeLogger "github.com/beego/bee/v2/logger"
-	"github.com/beego/bee/v2/utils"
+	"github.com/W3-Partha/Radical/cmd/commands"
+	"github.com/W3-Partha/Radical/cmd/commands/version"
+	radicalLogger "github.com/W3-Partha/Radical/logger"
+	"github.com/W3-Partha/Radical/utils"
 )
 
 var CmdPack = &commands.Command{
 	CustomFlags: true,
 	UsageLine:   "pack",
-	Short:       "Compresses a Beego application into a single file",
-	Long: `Pack is used to compress Beego applications into a tarball/zip file.
+	Short:       "Compresses a Radiant application into a single file",
+	Long: `Pack is used to compress Radiant applications into a tarball/zip file.
   This eases the deployment by directly extracting the file to a server.
 
   {{"Example:"|bold}}
-    $ bee pack -v -ba="-ldflags '-s -w'"
+    $ radical pack -v -ba="-ldflags '-s -w'"
 `,
 	PreRun: func(cmd *commands.Command, args []string) { version.ShowShortVersionBanner() },
 	Run:    packApp,
@@ -358,10 +358,10 @@ func (wft *zipWalk) compress(name, fpath string, fi os.FileInfo) (bool, error) {
 func packDirectory(output io.Writer, excludePrefix []string, excludeSuffix []string,
 	excludeRegexp []*regexp.Regexp, includePath ...string) (err error) {
 
-	beeLogger.Log.Infof("Excluding relpath prefix: %s", strings.Join(excludePrefix, ":"))
-	beeLogger.Log.Infof("Excluding relpath suffix: %s", strings.Join(excludeSuffix, ":"))
+	radicalLogger.Log.Infof("Excluding relpath prefix: %s", strings.Join(excludePrefix, ":"))
+	radicalLogger.Log.Infof("Excluding relpath suffix: %s", strings.Join(excludeSuffix, ":"))
 	if len(excludeRegexp) > 0 {
-		beeLogger.Log.Infof("Excluding filename regex: `%s`", strings.Join(excludeR, "`, `"))
+		radicalLogger.Log.Infof("Excluding filename regex: `%s`", strings.Join(excludeR, "`, `"))
 	}
 
 	w, err := os.OpenFile(outputP, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0644)
@@ -439,13 +439,13 @@ func packApp(cmd *commands.Command, args []string) int {
 
 	thePath, err := path.Abs(appPath)
 	if err != nil {
-		beeLogger.Log.Fatalf("Wrong application path: %s", thePath)
+		radicalLogger.Log.Fatalf("Wrong application path: %s", thePath)
 	}
 	if stat, err := os.Stat(thePath); os.IsNotExist(err) || !stat.IsDir() {
-		beeLogger.Log.Fatalf("Application path does not exist: %s", thePath)
+		radicalLogger.Log.Fatalf("Application path does not exist: %s", thePath)
 	}
 
-	beeLogger.Log.Infof("Packaging application on '%s'...", thePath)
+	radicalLogger.Log.Infof("Packaging application on '%s'...", thePath)
 
 	if len(appName) == 0 {
 		appName = path.Base(thePath)
@@ -462,19 +462,19 @@ func packApp(cmd *commands.Command, args []string) int {
 
 	str := strconv.FormatInt(time.Now().UnixNano(), 10)[9:]
 
-	tmpdir := path.Join(os.TempDir(), "beePack-"+str)
+	tmpdir := path.Join(os.TempDir(), "radicalPack-"+str)
 
 	os.Mkdir(tmpdir, 0700)
 	defer func() {
-		// Remove the tmpdir once bee pack is done
+		// Remove the tmpdir once radical pack is done
 		err := os.RemoveAll(tmpdir)
 		if err != nil {
-			beeLogger.Log.Error("Failed to remove the generated temp dir")
+			radicalLogger.Log.Error("Failed to remove the generated temp dir")
 		}
 	}()
 
 	if build {
-		beeLogger.Log.Infof("Building application (%v)...", appName)
+		radicalLogger.Log.Infof("Building application (%v)...", appName)
 		var envs []string
 		for _, env := range buildEnvs {
 			parts := strings.SplitN(env, "=", 2)
@@ -496,7 +496,7 @@ func packApp(cmd *commands.Command, args []string) int {
 		os.Setenv("GOOS", goos)
 		os.Setenv("GOARCH", goarch)
 
-		beeLogger.Log.Infof("Using: GOOS=%s GOARCH=%s", goos, goarch)
+		radicalLogger.Log.Infof("Using: GOOS=%s GOARCH=%s", goos, goarch)
 
 		binPath := path.Join(tmpdir, appName)
 		if goos == "windows" {
@@ -519,10 +519,10 @@ func packApp(cmd *commands.Command, args []string) int {
 		execmd.Dir = thePath
 		err = execmd.Run()
 		if err != nil {
-			beeLogger.Log.Fatal(err.Error())
+			radicalLogger.Log.Fatal(err.Error())
 		}
 
-		beeLogger.Log.Success("Build Successful!")
+		radicalLogger.Log.Success("Build Successful!")
 	}
 
 	switch format {
@@ -540,7 +540,7 @@ func packApp(cmd *commands.Command, args []string) int {
 	if _, err := os.Stat(outputP); err != nil {
 		err = os.MkdirAll(outputP, 0755)
 		if err != nil {
-			beeLogger.Log.Fatal(err.Error())
+			radicalLogger.Log.Fatal(err.Error())
 		}
 	}
 
@@ -563,20 +563,20 @@ func packApp(cmd *commands.Command, args []string) int {
 	for _, r := range excludeR {
 		if len(r) > 0 {
 			if re, err := regexp.Compile(r); err != nil {
-				beeLogger.Log.Fatal(err.Error())
+				radicalLogger.Log.Fatal(err.Error())
 			} else {
 				exr = append(exr, re)
 			}
 		}
 	}
 
-	beeLogger.Log.Infof("Writing to output: %s", outputP)
+	radicalLogger.Log.Infof("Writing to output: %s", outputP)
 
 	err = packDirectory(output, exp, exs, exr, tmpdir, thePath)
 	if err != nil {
-		beeLogger.Log.Fatal(err.Error())
+		radicalLogger.Log.Fatal(err.Error())
 	}
 
-	beeLogger.Log.Success("Application packed!")
+	radicalLogger.Log.Success("Application packed!")
 	return 0
 }

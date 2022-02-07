@@ -1,4 +1,4 @@
-// Copyright 2013 bee authors
+// Copyright 2013 radical authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License"): you may
 // not use this file except in compliance with the License. You may obtain
@@ -19,9 +19,9 @@ import (
 	"os"
 	"path"
 
-	beeLogger "github.com/beego/bee/v2/logger"
-	"github.com/beego/bee/v2/logger/colors"
-	"github.com/beego/bee/v2/utils"
+	radicalLogger "github.com/W3-Partha/Radical/logger"
+	"github.com/W3-Partha/Radical/logger/colors"
+	"github.com/W3-Partha/Radical/utils"
 )
 
 // recipe
@@ -29,12 +29,12 @@ import (
 func GenerateView(viewpath, currpath string) {
 	w := colors.NewColorWriter(os.Stdout)
 
-	beeLogger.Log.Info("Generating view...")
+	radicalLogger.Log.Info("Generating view...")
 
 	absViewPath := path.Join(currpath, "views", viewpath)
 	err := os.MkdirAll(absViewPath, os.ModePerm)
 	if err != nil {
-		beeLogger.Log.Fatalf("Could not create '%s' view: %s", viewpath, err)
+		radicalLogger.Log.Fatalf("Could not create '%s' view: %s", viewpath, err)
 	}
 
 	cfile := path.Join(absViewPath, "index.tpl")
@@ -43,7 +43,7 @@ func GenerateView(viewpath, currpath string) {
 		f.WriteString(cfile)
 		fmt.Fprintf(w, "\t%s%screate%s\t %s%s\n", "\x1b[32m", "\x1b[1m", "\x1b[21m", cfile, "\x1b[0m")
 	} else {
-		beeLogger.Log.Fatalf("Could not create view file: %s", err)
+		radicalLogger.Log.Fatalf("Could not create view file: %s", err)
 	}
 
 	cfile = path.Join(absViewPath, "show.tpl")
@@ -52,7 +52,7 @@ func GenerateView(viewpath, currpath string) {
 		f.WriteString(cfile)
 		fmt.Fprintf(w, "\t%s%screate%s\t %s%s\n", "\x1b[32m", "\x1b[1m", "\x1b[21m", cfile, "\x1b[0m")
 	} else {
-		beeLogger.Log.Fatalf("Could not create view file: %s", err)
+		radicalLogger.Log.Fatalf("Could not create view file: %s", err)
 	}
 
 	cfile = path.Join(absViewPath, "create.tpl")
@@ -61,7 +61,7 @@ func GenerateView(viewpath, currpath string) {
 		f.WriteString(cfile)
 		fmt.Fprintf(w, "\t%s%screate%s\t %s%s\n", "\x1b[32m", "\x1b[1m", "\x1b[21m", cfile, "\x1b[0m")
 	} else {
-		beeLogger.Log.Fatalf("Could not create view file: %s", err)
+		radicalLogger.Log.Fatalf("Could not create view file: %s", err)
 	}
 
 	cfile = path.Join(absViewPath, "edit.tpl")
@@ -70,6 +70,6 @@ func GenerateView(viewpath, currpath string) {
 		f.WriteString(cfile)
 		fmt.Fprintf(w, "\t%s%screate%s\t %s%s\n", "\x1b[32m", "\x1b[1m", "\x1b[21m", cfile, "\x1b[0m")
 	} else {
-		beeLogger.Log.Fatalf("Could not create view file: %s", err)
+		radicalLogger.Log.Fatalf("Could not create view file: %s", err)
 	}
 }

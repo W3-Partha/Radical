@@ -1,4 +1,4 @@
-package beegopro
+package radiantpro
 
 import (
 	"go/format"
@@ -11,8 +11,8 @@ import (
 	"github.com/flosch/pongo2"
 	"github.com/smartwalle/pongo2render"
 
-	"github.com/beego/bee/v2/internal/pkg/system"
-	beeLogger "github.com/beego/bee/v2/logger"
+	"github.com/W3-Partha/Radical/internal/pkg/system"
+	radicalLogger "github.com/W3-Partha/Radical/logger"
 )
 
 // render
@@ -35,7 +35,7 @@ func NewRender(m RenderInfo) *RenderFile {
 		newDescriptor Descriptor
 	)
 
-	// parse descriptor, get flush file path, beego path, etc...
+	// parse descriptor, get flush file path, radiant path, etc...
 	newDescriptor, pathCtx = m.Descriptor.Parse(m.ModelName, m.Option.Path)
 
 	obj := &RenderFile{
@@ -54,14 +54,14 @@ func NewRender(m RenderInfo) *RenderFile {
 	filePath := path.Dir(obj.FlushFile)
 	err := createPath(filePath)
 	if err != nil {
-		beeLogger.Log.Fatalf("Could not create the controllers directory: %s", err)
+		radicalLogger.Log.Fatalf("Could not create the controllers directory: %s", err)
 	}
 	// get go package path
 	obj.PkgPath = getPackagePath()
 
 	relativePath, err := filepath.Rel(system.CurrentDir, obj.FlushFile)
 	if err != nil {
-		beeLogger.Log.Fatalf("Could not get the relative path: %s", err)
+		radicalLogger.Log.Fatalf("Could not get the relative path: %s", err)
 	}
 
 	modelSchemas := m.Content.ToModelSchemas()
@@ -71,20 +71,20 @@ func NewRender(m RenderInfo) *RenderFile {
 		importMaps["time"] = struct{}{}
 	}
 	obj.PackageName = filepath.Base(filepath.Dir(relativePath))
-	beeLogger.Log.Infof("Using '%s' as name", obj.ModelName)
+	radicalLogger.Log.Infof("Using '%s' as name", obj.ModelName)
 
-	beeLogger.Log.Infof("Using '%s' as package name from %s", obj.ModelName, obj.PackageName)
+	radicalLogger.Log.Infof("Using '%s' as package name from %s", obj.ModelName, obj.PackageName)
 
 	// package
 	obj.SetContext("packageName", obj.PackageName)
 	obj.SetContext("packageImports", importMaps)
 
 	// todo optimize
-	// todo Set the beego directory, should recalculate the package
-	if pathCtx["pathRelBeego"] == "." {
+	// todo Set the radiant directory, should recalculate the package
+	if pathCtx["pathRelRadiant"] == "." {
 		obj.SetContext("packagePath", obj.PkgPath)
 	} else {
-		obj.SetContext("packagePath", obj.PkgPath+"/"+pathCtx["pathRelBeego"].(string))
+		obj.SetContext("packagePath", obj.PkgPath+"/"+pathCtx["pathRelRadiant"].(string))
 	}
 
 	obj.SetContext("packageMod", obj.PkgPath)
@@ -116,7 +116,7 @@ func (r *RenderFile) Exec(name string) {
 	)
 	buf, err = r.Render.Template(name).Execute(r.Context)
 	if err != nil {
-		beeLogger.Log.Fatalf("Could not create the %s render tmpl: %s", name, err)
+		radicalLogger.Log.Fatalf("Could not create the %s render tmpl: %s", name, err)
 		return
 	}
 	_, err = os.Stat(r.Descriptor.DstPath)
@@ -126,7 +126,7 @@ func (r *RenderFile) Exec(name string) {
 			orgContent, _ = ioutil.ReadAll(org)
 			org.Close()
 		} else {
-			beeLogger.Log.Infof("file err %s", err)
+			radicalLogger.Log.Infof("file err %s", err)
 		}
 	}
 	// Replace or create when content changes
@@ -137,7 +137,7 @@ func (r *RenderFile) Exec(name string) {
 		var bts []byte
 		bts, err = format.Source([]byte(buf))
 		if err != nil {
-			beeLogger.Log.Warnf("format buf error %s", err.Error())
+			radicalLogger.Log.Warnf("format buf error %s", err.Error())
 		}
 		output = bts
 	}
@@ -145,9 +145,9 @@ func (r *RenderFile) Exec(name string) {
 	if FileContentChange(orgContent, output, GetSeg(ext)) {
 		err = r.write(r.FlushFile, output)
 		if err != nil {
-			beeLogger.Log.Fatalf("Could not create file: %s", err)
+			radicalLogger.Log.Fatalf("Could not create file: %s", err)
 			return
 		}
-		beeLogger.Log.Infof("create file '%s' from %s", r.FlushFile, r.PackageName)
+		radicalLogger.Log.Infof("create file '%s' from %s", r.FlushFile, r.PackageName)
 	}
 }

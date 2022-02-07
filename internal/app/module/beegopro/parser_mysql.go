@@ -1,11 +1,11 @@
-package beegopro
+package radiantpro
 
 import (
 	"database/sql"
 	"fmt"
 
-	"github.com/beego/bee/v2/internal/pkg/utils"
-	beeLogger "github.com/beego/bee/v2/logger"
+	"github.com/W3-Partha/Radical/internal/pkg/utils"
+	radicalLogger "github.com/W3-Partha/Radical/logger"
 )
 
 type MysqlParser struct {
@@ -26,7 +26,7 @@ func (*MysqlParser) Parse(descriptor Descriptor) {
 func (m *MysqlParser) GetRenderInfos(descriptor Descriptor) (output []RenderInfo) {
 	tableSchemas, err := m.getTableSchemas()
 	if err != nil {
-		beeLogger.Log.Fatalf("get table schemas err %s", err)
+		radicalLogger.Log.Fatalf("get table schemas err %s", err)
 	}
 	models := tableSchemas.ToTableMap()
 
@@ -52,13 +52,13 @@ func (t *MysqlParser) Unregister() {
 func (m *MysqlParser) getTableSchemas() (resp TableSchemas, err error) {
 	dsn, err := utils.ParseDSN(m.userOption.Dsn)
 	if err != nil {
-		beeLogger.Log.Fatalf("parse dsn err %s", err)
+		radicalLogger.Log.Fatalf("parse dsn err %s", err)
 		return
 	}
 
 	conn, err := sql.Open("mysql", fmt.Sprintf("%s:%s@tcp(%s)/information_schema", dsn.User, dsn.Passwd, dsn.Addr))
 	if err != nil {
-		beeLogger.Log.Fatalf("Could not connect to mysql database using '%s': %s", m.userOption.Dsn, err)
+		radicalLogger.Log.Fatalf("Could not connect to mysql database using '%s': %s", m.userOption.Dsn, err)
 		return
 	}
 	defer conn.Close()

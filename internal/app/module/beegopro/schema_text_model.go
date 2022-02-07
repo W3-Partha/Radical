@@ -1,7 +1,7 @@
-package beegopro
+package radiantpro
 
 import (
-	beeLogger "github.com/beego/bee/v2/logger"
+	radicalLogger "github.com/W3-Partha/Radical/logger"
 )
 
 type TextModel struct {
@@ -16,11 +16,11 @@ func (content TextModel) ToModelInfos() (output []ModelInfo) {
 	ormsLen := len(content.Orms)
 	commentsLen := len(content.Comments)
 	if namesLen != ormsLen && namesLen != commentsLen {
-		beeLogger.Log.Fatalf("length error, namesLen is %d, ormsLen is %d, commentsLen is %d", namesLen, ormsLen, commentsLen)
+		radicalLogger.Log.Fatalf("length error, namesLen is %d, ormsLen is %d, commentsLen is %d", namesLen, ormsLen, commentsLen)
 	}
 	extendLen := len(content.Extends)
 	if extendLen != 0 && extendLen != namesLen {
-		beeLogger.Log.Fatalf("extend length error, namesLen is %d, extendsLen is %d", namesLen, extendLen)
+		radicalLogger.Log.Fatalf("extend length error, namesLen is %d, extendsLen is %d", namesLen, extendLen)
 	}
 
 	output = make([]ModelInfo, 0)

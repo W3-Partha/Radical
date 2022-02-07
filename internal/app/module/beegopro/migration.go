@@ -1,4 +1,4 @@
-package beegopro
+package radiantpro
 
 import (
 	"database/sql"
@@ -6,8 +6,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	beeLogger "github.com/beego/bee/v2/logger"
-	"github.com/beego/bee/v2/utils"
+	radicalLogger "github.com/W3-Partha/Radical/logger"
+	"github.com/W3-Partha/Radical/utils"
 )
 
 var SQL utils.DocValue
@@ -23,7 +23,7 @@ func (c *Container) Migration(args []string) {
 	c.initUserOption()
 	db, err := sql.Open(c.UserOption.Driver, c.UserOption.Dsn)
 	if err != nil {
-		beeLogger.Log.Fatalf("Could not connect to '%s' database using '%s': %s", c.UserOption.Driver, c.UserOption.Dsn, err)
+		radicalLogger.Log.Fatalf("Could not connect to '%s' database using '%s': %s", c.UserOption.Driver, c.UserOption.Dsn, err)
 		return
 	}
 	defer db.Close()
@@ -40,7 +40,7 @@ func (c *Container) Migration(args []string) {
 func doBySqlFile(db *sql.DB) {
 	fileName := SQL.String()
 	if !utils.IsExist(fileName) {
-		beeLogger.Log.Fatalf("sql mode path not exist, path %s", SQL.String())
+		radicalLogger.Log.Fatalf("sql mode path not exist, path %s", SQL.String())
 	}
 	doDb(db, fileName)
 }
@@ -48,12 +48,12 @@ func doBySqlFile(db *sql.DB) {
 func doByMode(db *sql.DB, suffix string) {
 	pathName := SQLModePath.String()
 	if !utils.IsExist(pathName) {
-		beeLogger.Log.Fatalf("sql mode path not exist, path %s", SQLModePath.String())
+		radicalLogger.Log.Fatalf("sql mode path not exist, path %s", SQLModePath.String())
 	}
 
 	rd, err := ioutil.ReadDir(pathName)
 	if err != nil {
-		beeLogger.Log.Fatalf("read dir err, path %s, err %s", pathName, err)
+		radicalLogger.Log.Fatalf("read dir err, path %s, err %s", pathName, err)
 	}
 	for _, fi := range rd {
 		if !fi.IsDir() {
@@ -69,12 +69,12 @@ func doDb(db *sql.DB, filePath string) {
 	absFile, _ := filepath.Abs(filePath)
 	content, err := ioutil.ReadFile(filePath)
 	if err != nil {
-		beeLogger.Log.Errorf("read file err %s, abs file %s", err, absFile)
+		radicalLogger.Log.Errorf("read file err %s, abs file %s", err, absFile)
 	}
 
 	_, err = db.Exec(string(content))
 	if err != nil {
-		beeLogger.Log.Errorf("db exec err %s", err)
+		radicalLogger.Log.Errorf("db exec err %s", err)
 	}
-	beeLogger.Log.Infof("db exec info %s", filePath)
+	radicalLogger.Log.Infof("db exec info %s", filePath)
 }

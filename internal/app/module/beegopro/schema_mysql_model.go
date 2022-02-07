@@ -1,10 +1,10 @@
-package beegopro
+package radiantpro
 
 import (
 	"database/sql"
 	"errors"
 
-	"github.com/beego/bee/v2/logger"
+	"github.com/W3-Partha/Radical/logger"
 )
 
 type TableSchema struct {
@@ -33,7 +33,7 @@ func (tableSchemas TableSchemas) ToTableMap() (resp map[string]ModelInfos) {
 		modelInfos := resp[value.TableName]
 		inputType, goType, err := value.ToGoType()
 		if err != nil {
-			beeLogger.Log.Fatalf("parse go type err %s", err)
+			radicalLogger.Log.Fatalf("parse go type err %s", err)
 			return
 		}
 

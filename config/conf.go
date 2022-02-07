@@ -1,4 +1,4 @@
-// Copyright 2013 bee authors
+// Copyright 2013 radical authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License"): you may
 // not use this file except in compliance with the License. You may obtain
@@ -21,14 +21,14 @@ import (
 
 	"gopkg.in/yaml.v2"
 
-	beeLogger "github.com/beego/bee/v2/logger"
+	radicalLogger "github.com/W3-Partha/Radical/logger"
 )
 
 const confVer = 0
 
 const (
 	Version       = "2.0.2"
-	GitRemotePath = "github.com/beego/bee/v2"
+	GitRemotePath = "github.com/W3-Partha/Radical"
 )
 
 var Conf = struct {
@@ -86,41 +86,41 @@ type database struct {
 	Dir    string
 }
 
-// LoadConfig loads the bee tool configuration.
-// It looks for Beefile or bee.json in the current path,
+// LoadConfig loads the radical tool configuration.
+// It looks for Radicalfile or radical.json in the current path,
 // and falls back to default configuration in case not found.
 func LoadConfig() {
 	currentPath, err := os.Getwd()
 	if err != nil {
-		beeLogger.Log.Error(err.Error())
+		radicalLogger.Log.Error(err.Error())
 	}
 
 	dir, err := os.Open(currentPath)
 	if err != nil {
-		beeLogger.Log.Error(err.Error())
+		radicalLogger.Log.Error(err.Error())
 	}
 	defer dir.Close()
 
 	files, err := dir.Readdir(-1)
 	if err != nil {
-		beeLogger.Log.Error(err.Error())
+		radicalLogger.Log.Error(err.Error())
 	}
 
 	for _, file := range files {
 		switch file.Name() {
-		case "bee.json":
+		case "radical.json":
 			{
 				err = parseJSON(filepath.Join(currentPath, file.Name()), &Conf)
 				if err != nil {
-					beeLogger.Log.Errorf("Failed to parse JSON file: %s", err)
+					radicalLogger.Log.Errorf("Failed to parse JSON file: %s", err)
 				}
 				break
 			}
-		case "Beefile":
+		case "Radicalfile":
 			{
 				err = parseYAML(filepath.Join(currentPath, file.Name()), &Conf)
 				if err != nil {
-					beeLogger.Log.Errorf("Failed to parse YAML file: %s", err)
+					radicalLogger.Log.Errorf("Failed to parse YAML file: %s", err)
 				}
 				break
 			}
@@ -129,8 +129,8 @@ func LoadConfig() {
 
 	// Check format version
 	if Conf.Version != confVer {
-		beeLogger.Log.Warn("Your configuration file is outdated. Please do consider updating it.")
-		beeLogger.Log.Hint("Check the latest version of bee's configuration file.")
+		radicalLogger.Log.Warn("Your configuration file is outdated. Please do consider updating it.")
+		radicalLogger.Log.Hint("Check the latest version of radical's configuration file.")
 	}
 
 	// Set variables

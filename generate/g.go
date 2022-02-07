@@ -1,4 +1,4 @@
-// Copyright 2013 bee authors
+// Copyright 2013 radical authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License"): you may
 // not use this file except in compliance with the License. You may obtain
@@ -14,7 +14,7 @@
 
 package generate
 
-import "github.com/beego/bee/v2/utils"
+import "github.com/W3-Partha/Radical/utils"
 
 var SQLDriver utils.DocValue
 var SQLConn utils.DocValue

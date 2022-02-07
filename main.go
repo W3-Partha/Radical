@@ -1,4 +1,4 @@
-// Copyright 2013 bee authors
+// Copyright 2013 radical authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License"): you may
 // not use this file except in compliance with the License. You may obtain
@@ -18,14 +18,14 @@ import (
 	"log"
 	"os"
 
-	"github.com/beego/bee/v2/cmd"
-	"github.com/beego/bee/v2/cmd/commands"
-	"github.com/beego/bee/v2/config"
-	"github.com/beego/bee/v2/utils"
+	"github.com/W3-Partha/Radical/cmd"
+	"github.com/W3-Partha/Radical/cmd/commands"
+	"github.com/W3-Partha/Radical/config"
+	"github.com/W3-Partha/Radical/utils"
 )
 
 func main() {
-	utils.NoticeUpdateBee()
+	utils.NoticeUpdateRadical()
 	flag.Usage = cmd.Usage
 	flag.Parse()
 	log.SetFlags(0)

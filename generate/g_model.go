@@ -1,4 +1,4 @@
-// Copyright 2013 bee authors
+// Copyright 2013 radical authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License"): you may
 // not use this file except in compliance with the License. You may obtain
@@ -21,9 +21,9 @@ import (
 	"path"
 	"strings"
 
-	beeLogger "github.com/beego/bee/v2/logger"
-	"github.com/beego/bee/v2/logger/colors"
-	"github.com/beego/bee/v2/utils"
+	radicalLogger "github.com/W3-Partha/Radical/logger"
+	"github.com/W3-Partha/Radical/logger/colors"
+	"github.com/W3-Partha/Radical/utils"
 )
 
 func GenerateModel(mname, fields, currpath string) {
@@ -39,17 +39,17 @@ func GenerateModel(mname, fields, currpath string) {
 
 	modelStruct, hastime, err := getStruct(modelName, fields)
 	if err != nil {
-		beeLogger.Log.Fatalf("Could not generate the model struct: %s", err)
+		radicalLogger.Log.Fatalf("Could not generate the model struct: %s", err)
 	}
 
-	beeLogger.Log.Infof("Using '%s' as model name", modelName)
-	beeLogger.Log.Infof("Using '%s' as package name", packageName)
+	radicalLogger.Log.Infof("Using '%s' as model name", modelName)
+	radicalLogger.Log.Infof("Using '%s' as package name", packageName)
 
 	fp := path.Join(currpath, "models", p)
 	if _, err := os.Stat(fp); os.IsNotExist(err) {
 		// Create the model's directory
 		if err := os.MkdirAll(fp, 0777); err != nil {
-			beeLogger.Log.Fatalf("Could not create the model directory: %s", err)
+			radicalLogger.Log.Fatalf("Could not create the model directory: %s", err)
 		}
 	}
 
@@ -69,7 +69,7 @@ func GenerateModel(mname, fields, currpath string) {
 		utils.FormatSourceCode(fpath)
 		fmt.Fprintf(w, "\t%s%screate%s\t %s%s\n", "\x1b[32m", "\x1b[1m", "\x1b[21m", fpath, "\x1b[0m")
 	} else {
-		beeLogger.Log.Fatalf("Could not create model file: %s", err)
+		radicalLogger.Log.Fatalf("Could not create model file: %s", err)
 	}
 }
 
@@ -106,7 +106,7 @@ func getStruct(structname, fields string) (string, bool, error) {
 }
 
 // fields support type
-// http://beego.me/docs/mvc/model/models.md#mysql
+// http://radiant.me/docs/mvc/model/models.md#mysql
 func getType(ktype string) (kt, tag string, hasTime bool) {
 	kv := strings.SplitN(ktype, ":", 2)
 	switch kv[0] {
@@ -145,7 +145,7 @@ import (
 	"reflect"
 	"strings"
 	{{timePkg}}
-	"github.com/beego/beego/v2/client/orm"
+	"github.com/W3-Engineers-Ltd/Radiant/client/orm"
 )
 
 {{modelStruct}}

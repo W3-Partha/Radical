@@ -9,7 +9,7 @@ install:
   - go get -u github.com/gordonklaus/ineffassign
 script:
   - pwd
-  - cd $(dirname `dirname $(pwd)`)/beego/bee
+  - cd $(dirname `dirname $(pwd)`)/radiant/radical
   - export GO111MODULE="on"
   - go mod download
   - find . ! \( -path './vendor' -prune \) -type f -name '*.go' -print0 | xargs -0 gofmt -l -s
