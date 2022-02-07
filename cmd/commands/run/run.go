@@ -14,6 +14,7 @@
 package run
 
 import (
+	"fmt"
 	"io/ioutil"
 	"os"
 	path "path/filepath"
@@ -183,6 +184,7 @@ func RunApp(cmd *commands.Command, args []string) int {
 	}
 	if gendoc == "true" {
 		NewWatcher(paths, files, true)
+		fmt.Println("gendoc: ", "path-", paths, "file-", files)
 		AutoBuild(files, true)
 	} else {
 		NewWatcher(paths, files, false)
