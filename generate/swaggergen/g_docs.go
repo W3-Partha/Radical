@@ -327,7 +327,9 @@ func GenerateDocs(curpath string) {
 		}
 	}
 	os.Mkdir(path.Join(curpath, "swagger"), 0755)
+	fmt.Println("current_path: ", curpath)
 	fd, err := os.Create(path.Join(curpath, "swagger", "swagger.json"))
+	fmt.Println("swagger json: ", fd)
 	if err != nil {
 		panic(err)
 	}
