@@ -16,6 +16,7 @@ package run
 
 import (
 	"bytes"
+	"fmt"
 	"os"
 	"os/exec"
 	"regexp"
@@ -113,6 +114,7 @@ func NewWatcher(paths []string, files []string, isgenerate bool) {
 
 // AutoBuild builds the specified set of files
 func AutoBuild(files []string, isgenerate bool) {
+	fmt.Println("autoBuild: ", files)
 	state.Lock()
 	defer state.Unlock()
 
